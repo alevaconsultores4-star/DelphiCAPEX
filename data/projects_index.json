@@ -1,0 +1,22 @@
+{
+  "projects": [
+    {
+      "project_id": "9359b4e8-35d6-4ebb-b862-c0357bed1be3",
+      "name": "CIBulk - Inducoque 1MW",
+      "created_at": "2026-01-09T17:53:49.160521",
+      "updated_at": "2026-01-22T02:47:54.462233"
+    },
+    {
+      "project_id": "c5a26130-344d-4980-a828-e3c70296d593",
+      "name": "CI Bulk - Inducoque 1 - Crystal",
+      "created_at": "2026-01-13T11:47:54.131446",
+      "updated_at": "2026-01-21T17:30:09.191247"
+    },
+    {
+      "project_id": "f94b8207-f132-4a01-90f9-dbb3f5255ef2",
+      "name": "CI Bulk - Veranera 1 - Poseidon",
+      "created_at": "2026-01-13T19:35:44.713126",
+      "updated_at": "2026-01-13T19:40:01.459941"
+    }
+  ]
+}

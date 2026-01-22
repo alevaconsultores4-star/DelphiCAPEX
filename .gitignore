@@ -12,4 +12,7 @@ __pycache__/
 .venv/
 venv/
 env/
-data/
+
+# Data folder - now included in git
+# Exclude only cache if it's temporary (uncomment if needed)
+# data/cache/

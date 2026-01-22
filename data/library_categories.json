@@ -1,0 +1,15 @@
+[
+  {"category_code":"PV-MOD","name_es":"Módulos","name_en":"Modules","ordering":10},
+  {"category_code":"PV-INV","name_es":"Inversores","name_en":"Inverters","ordering":20},
+  {"category_code":"PV-ESS","name_es":"Almacenamiento (BESS)","name_en":"Energy Storage (BESS)","ordering":30},
+  {"category_code":"PV-SBOS","name_es":"SBOS (Estructuras / Trackers)","name_en":"SBOS (Structural / Trackers)","ordering":40},
+  {"category_code":"PV-EBOS","name_es":"EBOS (Eléctrico)","name_en":"EBOS (Electrical BOS)","ordering":50},
+  {"category_code":"PV-CIV","name_es":"Obra civil y preparación de sitio","name_en":"Civil Works & Site Prep","ordering":60},
+  {"category_code":"PV-INST","name_es":"Instalación y construcción","name_en":"Installation & Construction","ordering":70},
+  {"category_code":"PV-SUB","name_es":"Subestación e Interconexión","name_en":"Substation & Interconnection","ordering":80},
+  {"category_code":"PV-SCADA","name_es":"SCADA / Comunicaciones / Seguridad","name_en":"SCADA / Comms / Security","ordering":90},
+  {"category_code":"PV-ENG","name_es":"Ingeniería, permisos y estudios","name_en":"Engineering, Permits & Studies","ordering":100},
+  {"category_code":"PV-DEV","name_es":"Desarrollo / Administración del proyecto","name_en":"Development / Project Management","ordering":110},
+  {"category_code":"PV-OTH","name_es":"Otros / Contingencias","name_en":"Other / Contingencies","ordering":120},
+  {"category_code":"LAND","name_es":"Tierra / Predios","name_en":"Land","ordering":130}
+]
