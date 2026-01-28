@@ -77,7 +77,7 @@ class ScenarioVariables:
     p50_mwh_per_year: float = 0.0
     p90_mwh_per_year: float = 0.0
     ac_power_mw: float = 0.0  # Can be MW or kW, stored as MW
-    dc_power_mwp: float = 0.0  # Can be MWp or kWp, stored as MWp
+    dc_power_mwp: float = 0.0  # Stored in kWp (field name kept for backward compatibility)
     currency: str = "COP"
     fx_rate: float = 1.0  # Exchange rate if currency != COP
     

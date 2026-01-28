@@ -490,7 +490,7 @@ def render_capex_builder():
     with col_sum3:
         kpi_card("Total Proyecto", format_cop(totals['project_total']))
     with col_sum4:
-        scenario_kwp = scenario.variables.dc_power_mwp * 1000.0
+        scenario_kwp = scenario.variables.dc_power_mwp
         cop_per_kwp_total = totals['project_total'] / scenario_kwp if scenario_kwp > 0 else 0.0
         kpi_card("COP/kWp", format_cop(cop_per_kwp_total) if cop_per_kwp_total > 0 else "N/A")
     
@@ -508,7 +508,7 @@ def render_capex_builder():
     
     with col2:
         p90 = st.number_input("P90 MWh/año", value=scenario.variables.p90_mwh_per_year, format="%.2f", key="p90_input")
-        dc_power = st.number_input("Potencia DC (MWp)", value=scenario.variables.dc_power_mwp, format="%.2f", key="dc_power_input")
+        dc_power = st.number_input("Potencia DC (kWp)", value=scenario.variables.dc_power_mwp, format="%.2f", key="dc_power_input")
     
     with col3:
         currency = st.selectbox("Moneda", options=["COP", "USD", "EUR"], index=["COP", "USD", "EUR"].index(scenario.variables.currency) if scenario.variables.currency in ["COP", "USD", "EUR"] else 0, key="currency_input")
@@ -526,33 +526,25 @@ def render_capex_builder():
     
     # Derived metrics (always visible) - Using KPI cards
     st.subheader("Métricas Derivadas")
-    scenario_kwp = scenario.variables.dc_power_mwp * 1000.0
+    scenario_kwp = scenario.variables.dc_power_mwp
     metrics_epc = calculate_normalization_metrics(totals['epc_total'], scenario)
     metrics_project = calculate_normalization_metrics(totals['project_total'], scenario)
     
     # EPC Scope KPIs
     st.markdown("**EPC Scope:**")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
     with col1:
         kpi_card("COP/kWp", format_cop(metrics_epc.get('cop_per_kwp')) if metrics_epc.get('cop_per_kwp') is not None else "N/A")
     with col2:
         kpi_card("COP/MWac", format_cop(metrics_epc.get('cop_per_mwac')) if metrics_epc.get('cop_per_mwac') is not None else "N/A")
-    with col3:
-        kpi_card("COP/MWh P50", format_cop(metrics_epc.get('cop_per_mwh_p50')) if metrics_epc.get('cop_per_mwh_p50') is not None else "N/A")
-    with col4:
-        kpi_card("COP/MWh P90", format_cop(metrics_epc.get('cop_per_mwh_p90')) if metrics_epc.get('cop_per_mwh_p90') is not None else "N/A")
     
     # Total Proyecto KPIs
     st.markdown("**Total Proyecto:**")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
     with col1:
         kpi_card("COP/kWp", format_cop(metrics_project.get('cop_per_kwp')) if metrics_project.get('cop_per_kwp') is not None else "N/A")
     with col2:
         kpi_card("COP/MWac", format_cop(metrics_project.get('cop_per_mwac')) if metrics_project.get('cop_per_mwac') is not None else "N/A")
-    with col3:
-        kpi_card("COP/MWh P50", format_cop(metrics_project.get('cop_per_mwh_p50')) if metrics_project.get('cop_per_mwh_p50') is not None else "N/A")
-    with col4:
-        kpi_card("COP/MWh P90", format_cop(metrics_project.get('cop_per_mwh_p90')) if metrics_project.get('cop_per_mwh_p90') is not None else "N/A")
     
     st.divider()
     

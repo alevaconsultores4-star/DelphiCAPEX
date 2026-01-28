@@ -28,7 +28,7 @@ def export_to_excel(scenario: Scenario, totals: Dict[str, float]) -> BytesIO:
     ws_inputs.append(["P50 MWh/año", scenario.variables.p50_mwh_per_year])
     ws_inputs.append(["P90 MWh/año", scenario.variables.p90_mwh_per_year])
     ws_inputs.append(["Potencia AC (MW)", scenario.variables.ac_power_mw])
-    ws_inputs.append(["Potencia DC (MWp)", scenario.variables.dc_power_mwp])
+    ws_inputs.append(["Potencia DC (kWp)", scenario.variables.dc_power_mwp])
     ws_inputs.append(["Moneda", scenario.variables.currency])
     ws_inputs.append(["Tasa de cambio", scenario.variables.fx_rate])
     ws_inputs.append([])
@@ -46,7 +46,7 @@ def export_to_excel(scenario: Scenario, totals: Dict[str, float]) -> BytesIO:
     items_data = []
     for item in scenario.items:
         item_total = totals['item_totals'].get(item.item_id, {'base': 0.0, 'vat': 0.0, 'total': 0.0})
-        scenario_kwp = scenario.variables.dc_power_mwp * 1000.0
+        scenario_kwp = scenario.variables.dc_power_mwp
         cop_per_kwp = item_total['total'] / scenario_kwp if scenario_kwp > 0 else 0.0
         
         items_data.append({
@@ -127,8 +127,6 @@ def export_to_excel(scenario: Scenario, totals: Dict[str, float]) -> BytesIO:
     ws_totals.append([])
     ws_totals.append(["COP/kWp", metrics.get('cop_per_kwp', 0)])
     ws_totals.append(["COP/MWac", metrics.get('cop_per_mwac', 0)])
-    ws_totals.append(["COP/MWh P50", metrics.get('cop_per_mwh_p50', 0)])
-    ws_totals.append(["COP/MWh P90", metrics.get('cop_per_mwh_p90', 0)])
     
     # Save to BytesIO
     output = BytesIO()
@@ -142,7 +140,7 @@ def export_items_to_csv(scenario: Scenario, totals: Dict[str, float]) -> str:
     items_data = []
     for item in scenario.items:
         item_total = totals['item_totals'].get(item.item_id, {'base': 0.0, 'vat': 0.0, 'total': 0.0})
-        scenario_kwp = scenario.variables.dc_power_mwp * 1000.0
+        scenario_kwp = scenario.variables.dc_power_mwp
         cop_per_kwp = item_total['total'] / scenario_kwp if scenario_kwp > 0 else 0.0
         
         items_data.append({

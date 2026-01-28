@@ -53,7 +53,7 @@ def calculate_scenario_totals(scenario: Scenario) -> Dict[str, float]:
     Calculate all totals for a scenario.
     Returns comprehensive totals dictionary.
     """
-    scenario_kwp = scenario.variables.dc_power_mwp * 1000.0  # Convert MWp to kWp
+    scenario_kwp = scenario.variables.dc_power_mwp  # Already in kWp
     
     # Calculate item totals
     item_totals = {}
@@ -142,24 +142,18 @@ def calculate_normalization_metrics(
     scenario: Scenario
 ) -> Dict[str, Optional[float]]:
     """
-    Calculate normalization metrics (COP/kWp, COP/MWac, COP/MWh).
+    Calculate normalization metrics (COP/kWp, COP/MWac).
     Returns dict with metrics or None if denominator is zero.
     """
-    dc_kwp = scenario.variables.dc_power_mwp * 1000.0
+    dc_kwp = scenario.variables.dc_power_mwp  # Already in kWp
     ac_mw = scenario.variables.ac_power_mw
-    p50_mwh = scenario.variables.p50_mwh_per_year
-    p90_mwh = scenario.variables.p90_mwh_per_year
     
     cop_per_kwp = capex_value / dc_kwp if dc_kwp > 0 else None
     cop_per_mwac = capex_value / ac_mw if ac_mw > 0 else None
-    cop_per_mwh_p50 = capex_value / p50_mwh if p50_mwh > 0 else None
-    cop_per_mwh_p90 = capex_value / p90_mwh if p90_mwh > 0 else None
     
     return {
         'cop_per_kwp': cop_per_kwp,
-        'cop_per_mwac': cop_per_mwac,
-        'cop_per_mwh_p50': cop_per_mwh_p50,
-        'cop_per_mwh_p90': cop_per_mwh_p90
+        'cop_per_mwac': cop_per_mwac
     }
 
 
