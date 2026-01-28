@@ -39,7 +39,7 @@ from ui_components import (
 )
 from uploads_service import upload_file, list_uploads, delete_upload, attach_upload_to_item
 from excel_export import export_to_excel, export_items_to_csv, export_summary_to_csv
-from compare_service import compare_scenarios, compare_three_scenarios, compare_four_scenarios
+from compare_service import compare_scenarios, compare_four_scenarios
 from formatting import format_cop, format_number, format_percentage, parse_number
 
 
