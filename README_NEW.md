@@ -16,7 +16,7 @@ Complete refactor of the CAPEX Builder into a Client → Project → Scenario hi
 - **uploads_service.py** - File upload management
 - **compare_service.py** - Scenario comparison logic
 - **excel_export.py** - Excel/CSV export with formulas
-- **app_new.py** - Main application (refactored)
+- **app.py** - Main application
 
 ### Data Storage
 
@@ -92,7 +92,7 @@ pip install -r requirements.txt
 
 2. Run the application:
 ```bash
-streamlit run app_new.py
+streamlit run app.py
 ```
 
 ## Usage
