@@ -1,9 +1,9 @@
 {
   "scenario_id": "6feaec43-c2d6-4760-a45f-33ed5b211678",
   "project_id": "0cb9f8e6-1e38-427c-be35-a35f97218894",
-  "name": "Presupuesto Tecnosolar - Jan 28 2026 (copia) (copia)",
+  "name": "Presupuesto Tecnosolar - Jan 28 2026",
   "created_at": "2026-01-28T11:28:43.458336",
-  "updated_at": "2026-01-28T11:36:41.323266",
+  "updated_at": "2026-01-28T12:54:23.378559",
   "variables": {
     "p50_mwh_per_year": 1802.7,
     "p90_mwh_per_year": 1642.4,

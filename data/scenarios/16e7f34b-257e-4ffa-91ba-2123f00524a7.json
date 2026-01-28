@@ -1,9 +1,9 @@
 {
-  "scenario_id": "e1bfa596-b6a2-4480-9281-735d254aee2c",
+  "scenario_id": "16e7f34b-257e-4ffa-91ba-2123f00524a7",
   "project_id": "e06d6425-1955-40eb-8d0e-4563c153fa6a",
-  "name": "Presupuesto Tecnosolar",
-  "created_at": "2026-01-22T04:08:05.095679",
-  "updated_at": "2026-01-28T11:48:30.795248",
+  "name": "Presupuesto Tecnosolar - Dic 2025",
+  "created_at": "2026-01-28T12:51:05.746298",
+  "updated_at": "2026-01-28T12:51:05.759571",
   "variables": {
     "p50_mwh_per_year": 1877.0,
     "p90_mwh_per_year": 1710.5,
@@ -25,7 +25,7 @@
   },
   "items": [
     {
-      "item_id": "da77c998-3972-43df-b05c-9457626e5eba",
+      "item_id": "32bf84ee-d49c-4dcd-8370-cf8089377394",
       "item_code": "MOD-BC-XXX",
       "name": "JA SOLAR 710W BIFACIALES",
       "category_code": "PV-MOD",
@@ -51,7 +51,7 @@
       "order": 1
     },
     {
-      "item_id": "70a77754-d8e2-4822-a1a1-fd56b597d355",
+      "item_id": "df13c851-9fe0-4734-af14-5ded19e63772",
       "item_code": "INV-CEN-XXX",
       "name": "Huawie SUN2000 330KTL",
       "category_code": "PV-INV",
@@ -77,7 +77,7 @@
       "order": 1
     },
     {
-      "item_id": "8f60f8b2-dbc5-4123-a5c1-f415a92eba44",
+      "item_id": "c1c99306-9010-4c54-8ae7-f31f3c03dcd1",
       "item_code": "INV-SKID-LV",
       "name": "Smart Logger 300A",
       "category_code": "PV-INV",
@@ -103,7 +103,7 @@
       "order": 2
     },
     {
-      "item_id": "9337c112-4893-46e8-8846-695935fe5389",
+      "item_id": "9d0faf01-3e32-4c1a-ad40-e8aecf083eb5",
       "item_code": "INV-STR-XXX",
       "name": "SmartPS-80A- T0",
       "category_code": "PV-INV",
@@ -129,7 +129,7 @@
       "order": 3
     },
     {
-      "item_id": "682edce9-43b2-45f1-8b6b-8cd8fed9c7ce",
+      "item_id": "a30c3797-ed5e-4a6b-8011-1639a6949eba",
       "item_code": "SBOS-FIX",
       "name": "Estructura fija (suministro)",
       "category_code": "PV-SBOS",
@@ -155,7 +155,7 @@
       "order": 4
     },
     {
-      "item_id": "38692712-1688-4733-98c6-5437737ab4e5",
+      "item_id": "2f497b3a-e870-4868-8c4e-fa66730da872",
       "item_code": "ENG-GEO",
       "name": "Estudio geotécnico / suelos",
       "category_code": "PV-ENG",
@@ -181,7 +181,7 @@
       "order": 5
     },
     {
-      "item_id": "b7c13f47-c1e1-4993-9c99-61014ec0f63c",
+      "item_id": "3570631a-9d52-49b3-b2ba-80bc0efcaf2e",
       "item_code": "ENG-RETIE",
       "name": "Gestión RETIE / certificación",
       "category_code": "PV-ENG",
@@ -207,7 +207,7 @@
       "order": 6
     },
     {
-      "item_id": "8375250e-cf45-441d-9576-a08db3a94e33",
+      "item_id": "b09deef6-fae0-457d-bf2a-1af67fbde549",
       "item_code": "ENG-UPME",
       "name": "Trámites UPME / conexión (si aplica)",
       "category_code": "PV-ENG",
@@ -233,7 +233,7 @@
       "order": 7
     },
     {
-      "item_id": "be5ce55d-2fa0-417d-a9b5-da2e33772d00",
+      "item_id": "8f272778-cb57-4f4b-a28b-6b1813b24494",
       "item_code": "SUB-STUDY-INT",
       "name": "Estudios de conexión / interconexión",
       "category_code": "PV-SUB",
@@ -259,7 +259,7 @@
       "order": 9
     },
     {
-      "item_id": "5c475f80-1b85-46ba-a28c-658d4632d89b",
+      "item_id": "4d0123d2-4463-478d-88c1-61f09144c910",
       "item_code": "EBOS-EARTH",
       "name": "Puesta a tierra",
       "category_code": "PV-EBOS",
@@ -285,7 +285,7 @@
       "order": 11
     },
     {
-      "item_id": "299be5f4-e967-4872-8d77-86894d6fd26f",
+      "item_id": "52ac758b-e37e-4912-a7e6-e5c3689a8a12",
       "item_code": "EBOS-MAT-DCAC",
       "name": "Material DC/AC (lote general)",
       "category_code": "PV-EBOS",
@@ -311,7 +311,7 @@
       "order": 12
     },
     {
-      "item_id": "a047e326-bd2e-470c-9232-f89c78890a0d",
+      "item_id": "03f09b81-8b24-4c04-92f5-46f000d8c3c9",
       "item_code": "EBOS-LPS",
       "name": "Protección contra rayos (LPS)",
       "category_code": "PV-EBOS",
@@ -337,7 +337,7 @@
       "order": 13
     },
     {
-      "item_id": "0a1dd74e-ae23-4ea9-8f94-399efeec7f0d",
+      "item_id": "be72e828-5a0f-4ca8-9475-61f1a07683a1",
       "item_code": "CIV-EXC-FOUND",
       "name": "Excavación zapatas y/o pilotes",
       "category_code": "PV-CIV",
@@ -363,7 +363,7 @@
       "order": 14
     },
     {
-      "item_id": "23a45720-95e7-45c1-b9f8-262bb4d4be5d",
+      "item_id": "7fe37ee1-6b6b-45ac-9005-2c76f1e77d29",
       "item_code": "CIV-CONC-FOUND",
       "name": "Concreto zapatas y/o pilotes",
       "category_code": "PV-CIV",
@@ -389,7 +389,7 @@
       "order": 15
     },
     {
-      "item_id": "b571b37e-dac5-4e93-9ab9-1a174292e69a",
+      "item_id": "8f34aaa6-622b-4356-9561-0c1291e04975",
       "item_code": "DEV-POLICY",
       "name": "Pólizas contractuales",
       "category_code": "PV-DEV",
@@ -415,7 +415,7 @@
       "order": 15
     },
     {
-      "item_id": "95b4c5c7-e05b-485a-b41f-4779885384a3",
+      "item_id": "ffd64451-e255-43fe-b791-874d491e137b",
       "item_code": "DEV-TRANSPORT",
       "name": "Transporte / logística local",
       "category_code": "PV-DEV",
@@ -441,7 +441,7 @@
       "order": 16
     },
     {
-      "item_id": "45a16bc1-9f8d-48c2-b57c-767048532539",
+      "item_id": "2017b60c-4eda-41ee-86f1-e0d7aa304cf2",
       "item_code": "ENG-DETAIL",
       "name": "Ingeniería de detalle",
       "category_code": "PV-ENG",
@@ -467,7 +467,7 @@
       "order": 17
     },
     {
-      "item_id": "5f9276d9-b8f4-4204-8e38-0aa1006cc4c2",
+      "item_id": "05b72f5c-13db-4778-be2b-a7da2cae339d",
       "item_code": "CIV-SEC",
       "name": "Seguridad / vigilancia de obra",
       "category_code": "PV-CIV",
@@ -493,7 +493,7 @@
       "order": 18
     },
     {
-      "item_id": "1d0ea4a7-a4d9-4b05-933f-71bc740164a0",
+      "item_id": "10d910de-00b0-425d-964c-e030ac57c66a",
       "item_code": "EBOS-TRNCH",
       "name": "Zanjas / ductería / canalización",
       "category_code": "PV-EBOS",
@@ -519,7 +519,7 @@
       "order": 19
     },
     {
-      "item_id": "b365667e-28b9-4ba0-8b26-2a723bb9da43",
+      "item_id": "b8e5f788-84a9-450f-a299-7929058167a4",
       "item_code": "EBOS-TRF-1250KVA",
       "name": "Estación de Transformación 1.250 kVA",
       "category_code": "PV-EBOS",
@@ -545,7 +545,7 @@
       "order": 19
     },
     {
-      "item_id": "619b1db5-5613-4e0d-83a3-bbf2d7bec891",
+      "item_id": "494f3f47-9ad7-42a1-a197-c70522344cdf",
       "item_code": "SEC-CCTV",
       "name": "CCTV y seguridad electrónica",
       "category_code": "PV-SCADA",
@@ -571,7 +571,7 @@
       "order": 20
     },
     {
-      "item_id": "6f430a07-c288-4729-a489-f21a798e286e",
+      "item_id": "47bff3ee-9769-4392-9d96-31adc48bc5e4",
       "item_code": "SUB-MV-CONN",
       "name": "Conexión a Red de Media",
       "category_code": "PV-SUB",
@@ -597,7 +597,7 @@
       "order": 21
     },
     {
-      "item_id": "ed86bf4c-b227-4a3b-b921-eddb96568e1c",
+      "item_id": "66294de4-f2e9-4364-872f-733bf5bc522c",
       "item_code": "INST-FORKLIFT",
       "name": "Montacarga / equipos de izaje (alquiler)",
       "category_code": "PV-INST",
@@ -623,7 +623,7 @@
       "order": 22
     },
     {
-      "item_id": "ad42cea8-3c72-42f6-ba94-fcfdf3f7187e",
+      "item_id": "e65fc993-ae07-49c0-b85b-27bed4e6664e",
       "item_code": "INST-MOD",
       "name": "Instalación de módulos",
       "category_code": "PV-INST",
@@ -649,7 +649,7 @@
       "order": 23
     },
     {
-      "item_id": "3263dd21-2730-4408-acad-787636964cb6",
+      "item_id": "a7b019dd-37aa-48ea-a86d-4abd5b79876e",
       "item_code": "ENG-AC-DESIGN",
       "name": "Diseño Eléctrico AC",
       "category_code": "PV-ENG",
@@ -675,7 +675,7 @@
       "order": 24
     },
     {
-      "item_id": "287dd738-63e5-4aab-80a7-f497bb4d0248",
+      "item_id": "5fa8ddd1-12aa-4246-9b60-164f9e33c62e",
       "item_code": "EBOS-METER",
       "name": "Medición (medidor bidireccional / medición comercial)",
       "category_code": "PV-EBOS",
@@ -701,7 +701,7 @@
       "order": 26
     },
     {
-      "item_id": "2029c854-fd26-4caa-abe2-eb53ed61ef26",
+      "item_id": "b42337c3-3b03-4310-9ec2-02ad38e40919",
       "item_code": "ENG-UTILITY-FILING",
       "name": "Costos Radicado CENS",
       "category_code": "PV-ENG",

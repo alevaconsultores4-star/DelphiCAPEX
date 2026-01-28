@@ -1,9 +1,9 @@
 {
   "scenario_id": "4bc72087-ec48-4f4c-97ab-a245a650b40a",
   "project_id": "f5a6bfdc-f5bd-4e3f-93a9-1e3502fb9045",
-  "name": "Presupuesto Tecnosolar - Compras Cliente (copia)",
+  "name": "Presupuesto Tecnosolar - Compras Cliente",
   "created_at": "2026-01-28T10:49:50.726904",
-  "updated_at": "2026-01-28T10:49:50.786928",
+  "updated_at": "2026-01-28T12:52:28.545146",
   "variables": {
     "p50_mwh_per_year": 1877.0,
     "p90_mwh_per_year": 1710.5,
