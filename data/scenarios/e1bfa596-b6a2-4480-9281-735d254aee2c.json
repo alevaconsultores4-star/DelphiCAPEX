@@ -3,7 +3,7 @@
   "project_id": "e06d6425-1955-40eb-8d0e-4563c153fa6a",
   "name": "Presupuesto Tecnosolar",
   "created_at": "2026-01-22T04:08:05.095679",
-  "updated_at": "2026-01-22T07:39:46.312187",
+  "updated_at": "2026-01-28T11:48:30.795248",
   "variables": {
     "p50_mwh_per_year": 1877.0,
     "p90_mwh_per_year": 1710.5,
@@ -21,7 +21,7 @@
   "vat_config": {
     "vat_recoverable": true,
     "vat_on_utilidad_enabled": true,
-    "vat_rate_utilidad": 19.0
+    "vat_rate_utilidad": 0.0
   },
   "items": [
     {
@@ -34,7 +34,7 @@
       "unit": "UND",
       "pricing_mode": "UNIT",
       "price": 370378.0,
-      "vat_rate": 19.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": false,
       "aiu_factors": {
@@ -60,7 +60,7 @@
       "unit": "UND",
       "pricing_mode": "UNIT",
       "price": 45780000.0,
-      "vat_rate": 19.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": false,
       "aiu_factors": {
@@ -112,7 +112,7 @@
       "unit": "UND",
       "pricing_mode": "UNIT",
       "price": 800000.0,
-      "vat_rate": 19.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": false,
       "aiu_factors": {
@@ -394,10 +394,10 @@
       "name": "Pólizas contractuales",
       "category_code": "PV-DEV",
       "description": "Pólizas de seguro contractuales",
-      "qty": 0.0,
+      "qty": 1.0,
       "unit": "LOTE",
-      "pricing_mode": "PER_KWP",
-      "price": 19.233,
+      "pricing_mode": "UNIT",
+      "price": 24579889.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -420,10 +420,10 @@
       "name": "Transporte / logística local",
       "category_code": "PV-DEV",
       "description": "Transporte y logística local del proyecto",
-      "qty": 0.0,
+      "qty": 1.0,
       "unit": "LOTE",
-      "pricing_mode": "PER_KWP",
-      "price": 12.021,
+      "pricing_mode": "UNIT",
+      "price": 15362431.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -446,10 +446,10 @@
       "name": "Ingeniería de detalle",
       "category_code": "PV-ENG",
       "description": "Planos IFC, memorias, especificaciones",
-      "qty": 0.0,
+      "qty": 1.0,
       "unit": "LOTE",
-      "pricing_mode": "PER_KWP",
-      "price": 14.906,
+      "pricing_mode": "UNIT",
+      "price": 19049414.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -528,7 +528,7 @@
       "unit": "Unidad",
       "pricing_mode": "UNIT",
       "price": 479000000.0,
-      "vat_rate": 19.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": false,
       "aiu_factors": {

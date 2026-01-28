@@ -39,7 +39,7 @@ from ui_components import (
 )
 from uploads_service import upload_file, list_uploads, delete_upload, attach_upload_to_item
 from excel_export import export_to_excel, export_items_to_csv, export_summary_to_csv
-from compare_service import compare_scenarios
+from compare_service import compare_scenarios, compare_three_scenarios, compare_four_scenarios
 from formatting import format_cop, format_number, format_percentage, parse_number
 
 
@@ -398,6 +398,79 @@ def render_sidebar():
 # CAPEX BUILDER TAB
 # ============================================================================
 
+def save_scenario_changes(scenario: Scenario):
+    """
+    Helper function to save all scenario changes from session state.
+    Applies all tracked changes to items, variables, and configs.
+    """
+    # Apply all tracked changes to items
+    for item in scenario.items:
+        item_key = f"item_{item.item_id}"
+        if item_key in st.session_state:
+            changes = st.session_state[item_key]
+            item.item_code = changes.get('code', item.item_code)
+            item.name = changes.get('name', item.name)
+            item.qty = changes.get('qty', item.qty)
+            item.unit = changes.get('unit', item.unit)
+            item.pricing_mode = changes.get('pricing_mode', item.pricing_mode)
+            item.price = changes.get('price', item.price)
+            item.vat_rate = changes.get('vat_rate', item.vat_rate)
+            item.price_includes_vat = changes.get('price_includes_vat', getattr(item, 'price_includes_vat', False))
+            item.client_pays = changes.get('client_pays', item.client_pays)
+            
+            # Apply commercial details
+            if 'commercial' in changes:
+                comm = changes['commercial']
+                item.incoterm = comm.get('incoterm', item.incoterm)
+                item.includes_installation = comm.get('includes_installation', item.includes_installation)
+                item.includes_transport = comm.get('includes_transport', item.includes_transport)
+                item.delivery_point = comm.get('delivery_point', item.delivery_point)
+                item.includes_commissioning = comm.get('includes_commissioning', item.includes_commissioning)
+                item.notes = comm.get('notes', item.notes)
+            
+            # Apply AIU factors
+            if 'aiu_factors' in changes:
+                factors = changes['aiu_factors']
+                item.aiu_factors.admin_factor = factors.get('admin_factor', item.aiu_factors.admin_factor)
+                item.aiu_factors.imprev_factor = factors.get('imprev_factor', item.aiu_factors.imprev_factor)
+                item.aiu_factors.util_factor = factors.get('util_factor', item.aiu_factors.util_factor)
+    
+    # Apply variable changes from session state
+    if 'p50_input' in st.session_state:
+        scenario.variables.p50_mwh_per_year = st.session_state['p50_input']
+    if 'p90_input' in st.session_state:
+        scenario.variables.p90_mwh_per_year = st.session_state['p90_input']
+    if 'ac_power_input' in st.session_state:
+        scenario.variables.ac_power_mw = st.session_state['ac_power_input']
+    if 'dc_power_input' in st.session_state:
+        scenario.variables.dc_power_mwp = st.session_state['dc_power_input']
+    if 'currency_input' in st.session_state:
+        scenario.variables.currency = st.session_state['currency_input']
+    if 'fx_rate_input' in st.session_state:
+        scenario.variables.fx_rate = st.session_state['fx_rate_input']
+    
+    # Apply AIU config changes
+    if 'aiu_enabled' in st.session_state:
+        scenario.aiu_config.enabled = st.session_state['aiu_enabled']
+    if 'admin_pct' in st.session_state:
+        scenario.aiu_config.admin_pct = st.session_state['admin_pct']
+    if 'imprev_pct' in st.session_state:
+        scenario.aiu_config.imprev_pct = st.session_state['imprev_pct']
+    if 'util_pct' in st.session_state:
+        scenario.aiu_config.util_pct = st.session_state['util_pct']
+    
+    # Apply VAT config changes
+    if 'vat_recoverable' in st.session_state:
+        scenario.vat_config.vat_recoverable = st.session_state['vat_recoverable']
+    if 'vat_on_util' in st.session_state:
+        scenario.vat_config.vat_on_utilidad_enabled = st.session_state['vat_on_util']
+    if 'vat_rate_util' in st.session_state:
+        scenario.vat_config.vat_rate_utilidad = st.session_state['vat_rate_util']
+    
+    # Save the scenario
+    save_scenario(scenario)
+
+
 def render_capex_builder():
     """Render the main CAPEX Builder tab."""
     scenario = load_scenario(st.session_state.current_scenario_id) if st.session_state.current_scenario_id else None
@@ -410,6 +483,14 @@ def render_capex_builder():
     client = load_client(st.session_state.current_client_id)
     
     st.header(f"📝 CAPEX Builder: {client.name if client else ''} → {project.name if project else ''} → {scenario.name}")
+    
+    # Save button at the top
+    col_save, col_spacer = st.columns([1, 5])
+    with col_save:
+        if st.button("💾 Guardar Cambios", type="primary", key="save_changes_top", use_container_width=True):
+            save_scenario_changes(scenario)
+            st.success("✅ Cambios guardados")
+            st.rerun()
     
     # Create temporary scenario with current widget values for live totals
     # Read directly from widget session state keys to get most recent values
@@ -968,40 +1049,8 @@ def render_capex_builder():
     st.markdown("### 💾 Guardar Cambios")
     st.markdown("Todos los cambios realizados arriba se guardarán permanentemente al hacer clic en el botón.")
     
-    if st.button("💾 Guardar Cambios", type="primary", use_container_width=True):
-        # Apply all tracked changes
-        for item in scenario.items:
-            item_key = f"item_{item.item_id}"
-            if item_key in st.session_state:
-                changes = st.session_state[item_key]
-                item.item_code = changes.get('code', item.item_code)
-                item.name = changes.get('name', item.name)
-                item.qty = changes.get('qty', item.qty)
-                item.unit = changes.get('unit', item.unit)
-                item.pricing_mode = changes.get('pricing_mode', item.pricing_mode)
-                item.price = changes.get('price', item.price)
-                item.vat_rate = changes.get('vat_rate', item.vat_rate)
-                item.price_includes_vat = changes.get('price_includes_vat', getattr(item, 'price_includes_vat', False))
-                item.client_pays = changes.get('client_pays', item.client_pays)
-                
-                # Apply commercial details
-                if 'commercial' in changes:
-                    comm = changes['commercial']
-                    item.incoterm = comm.get('incoterm', item.incoterm)
-                    item.includes_installation = comm.get('includes_installation', item.includes_installation)
-                    item.includes_transport = comm.get('includes_transport', item.includes_transport)
-                    item.delivery_point = comm.get('delivery_point', item.delivery_point)
-                    item.includes_commissioning = comm.get('includes_commissioning', item.includes_commissioning)
-                    item.notes = comm.get('notes', item.notes)
-                
-                # Apply AIU factors
-                if 'aiu_factors' in changes:
-                    factors = changes['aiu_factors']
-                    item.aiu_factors.admin_factor = factors.get('admin_factor', item.aiu_factors.admin_factor)
-                    item.aiu_factors.imprev_factor = factors.get('imprev_factor', item.aiu_factors.imprev_factor)
-                    item.aiu_factors.util_factor = factors.get('util_factor', item.aiu_factors.util_factor)
-        
-        save_scenario(scenario)
+    if st.button("💾 Guardar Cambios", type="primary", use_container_width=True, key="save_changes_bottom"):
+        save_scenario_changes(scenario)
         st.success("✅ Cambios guardados")
         st.rerun()
     
@@ -1158,6 +1207,231 @@ def render_library():
 
 
 # ============================================================================
+# PROJECTS OVERVIEW
+# ============================================================================
+
+def render_projects_overview():
+    """Render overview of all projects for the selected client with metrics."""
+    client = load_client(st.session_state.current_client_id)
+    
+    if not client:
+        st.info("Cliente no encontrado.")
+        return
+    
+    st.header(f"📊 Resumen de Proyectos: {client.name}")
+    
+    # Get all projects for client
+    projects = get_projects_by_client(st.session_state.current_client_id)
+    
+    if not projects:
+        st.info("No hay proyectos para este cliente. Crea uno nuevo desde el panel lateral.")
+        return
+    
+    # Store selected scenarios per project in session state
+    if 'project_scenario_selections' not in st.session_state:
+        st.session_state.project_scenario_selections = {}
+    
+    # Prepare data for table
+    table_data = []
+    
+    # Initialize totals accumulators
+    total_capex = 0.0
+    total_kwp = 0.0
+    total_mwh = 0.0
+    total_epc = 0.0
+    total_client = 0.0
+    
+    for project in projects:
+        project_id = project['project_id']
+        project_name = project['name']
+        
+        # Get scenarios for this project
+        scenarios = get_scenarios_by_project(project_id)
+        
+        if not scenarios:
+            # No scenarios, show empty row
+            table_data.append({
+                'Proyecto': project_name,
+                'Escenario': 'Sin escenarios',
+                'CAPEX Total': 'N/A',
+                'kWp': 'N/A',
+                'MWh/año': 'N/A',
+                'Valor EPC': 'N/A',
+                'Compras Cliente': 'N/A',
+                'Acción': project_id
+            })
+            continue
+        
+        # Get or set default scenario for this project
+        if project_id not in st.session_state.project_scenario_selections:
+            # Default to first scenario or most recently updated
+            st.session_state.project_scenario_selections[project_id] = scenarios[0]['scenario_id']
+        
+        selected_scenario_id = st.session_state.project_scenario_selections[project_id]
+        
+        # Find selected scenario
+        selected_scenario = next((s for s in scenarios if s['scenario_id'] == selected_scenario_id), None)
+        if not selected_scenario:
+            # If selected scenario not found, use first one
+            selected_scenario = scenarios[0]
+            st.session_state.project_scenario_selections[project_id] = selected_scenario['scenario_id']
+        
+        # Load full scenario to calculate metrics
+        scenario = load_scenario(selected_scenario_id)
+        
+        if scenario:
+            # Calculate totals
+            totals = calculate_scenario_totals(scenario)
+            
+            # Get metrics
+            capex_total = totals['project_total']
+            kwp = scenario.variables.dc_power_mwp
+            mwh_per_year = scenario.variables.p50_mwh_per_year
+            epc_total = totals['epc_total']
+            client_total = totals['client_total']
+            
+            # Accumulate totals (only numeric values)
+            total_capex += capex_total
+            total_kwp += kwp
+            total_mwh += mwh_per_year
+            total_epc += epc_total
+            total_client += client_total
+            
+            table_data.append({
+                'Proyecto': project_name,
+                'Escenario': selected_scenario['name'],
+                'CAPEX Total': format_cop(capex_total),
+                'kWp': format_number(kwp, decimals=2),
+                'MWh/año': format_number(mwh_per_year, decimals=2),
+                'Valor EPC': format_cop(epc_total),
+                'Compras Cliente': format_cop(client_total),
+                'Acción': project_id,
+                '_scenario_id': selected_scenario_id,
+                '_scenarios': scenarios
+            })
+        else:
+            table_data.append({
+                'Proyecto': project_name,
+                'Escenario': 'Error cargando',
+                'CAPEX Total': 'N/A',
+                'kWp': 'N/A',
+                'MWh/año': 'N/A',
+                'Valor EPC': 'N/A',
+                'Compras Cliente': 'N/A',
+                'Acción': project_id,
+                '_scenarios': scenarios
+            })
+    
+    # Display table with scenario selectors
+    st.subheader("Proyectos y Métricas")
+    
+    # Header row
+    col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([2, 2, 2, 1.5, 1.5, 2, 2, 1.5])
+    with col1:
+        st.markdown("**Proyecto**")
+    with col2:
+        st.markdown("**Escenario**")
+    with col3:
+        st.markdown("**CAPEX Total**")
+    with col4:
+        st.markdown("**kWp**")
+    with col5:
+        st.markdown("**MWh/año**")
+    with col6:
+        st.markdown("**Valor EPC**")
+    with col7:
+        st.markdown("**Compras Cliente**")
+    with col8:
+        st.markdown("**Acción**")
+    
+    st.divider()
+    
+    # Create a more interactive table using columns
+    for idx, row_data in enumerate(table_data):
+        with st.container():
+            col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([2, 2, 2, 1.5, 1.5, 2, 2, 1.5])
+            
+            project_id = row_data['Acción']
+            
+            with col1:
+                st.markdown(f"**{row_data['Proyecto']}**")
+            
+            with col2:
+                if row_data.get('_scenarios') and len(row_data['_scenarios']) > 0:
+                    scenario_options = {s['name']: s['scenario_id'] for s in row_data['_scenarios']}
+                    selected_scenario_name = next(
+                        (s['name'] for s in row_data['_scenarios'] if s['scenario_id'] == row_data.get('_scenario_id', '')),
+                        row_data['_scenarios'][0]['name']
+                    )
+                    
+                    new_selection = st.selectbox(
+                        "Escenario",
+                        options=list(scenario_options.keys()),
+                        index=list(scenario_options.keys()).index(selected_scenario_name) if selected_scenario_name in scenario_options.keys() else 0,
+                        key=f"scenario_selector_{project_id}",
+                        label_visibility="collapsed"
+                    )
+                    
+                    # Update selection if changed
+                    if new_selection in scenario_options:
+                        new_scenario_id = scenario_options[new_selection]
+                        if st.session_state.project_scenario_selections.get(project_id) != new_scenario_id:
+                            st.session_state.project_scenario_selections[project_id] = new_scenario_id
+                            st.rerun()
+                else:
+                    st.markdown("Sin escenarios")
+            
+            with col3:
+                st.markdown(row_data['CAPEX Total'])
+            
+            with col4:
+                st.markdown(row_data['kWp'])
+            
+            with col5:
+                st.markdown(row_data['MWh/año'])
+            
+            with col6:
+                st.markdown(row_data['Valor EPC'])
+            
+            with col7:
+                st.markdown(row_data['Compras Cliente'])
+            
+            with col8:
+                if row_data.get('_scenario_id'):
+                    if st.button("Ver", key=f"view_{project_id}", use_container_width=True):
+                        st.session_state.current_project_id = project_id
+                        st.session_state.current_scenario_id = row_data['_scenario_id']
+                        st.rerun()
+            
+            st.divider()
+    
+    # Totals row
+    st.markdown('<div style="background-color: #F5F7FA; padding: 12px; border-radius: 8px; margin-top: 8px;">', unsafe_allow_html=True)
+    col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([2, 2, 2, 1.5, 1.5, 2, 2, 1.5])
+    with col1:
+        st.markdown("**TOTALES**")
+    with col2:
+        st.markdown("")  # Vacío para escenario
+    with col3:
+        st.markdown(f"**{format_cop(total_capex)}**")
+    with col4:
+        st.markdown(f"**{format_number(total_kwp, decimals=2)}**")
+    with col5:
+        st.markdown(f"**{format_number(total_mwh, decimals=2)}**")
+    with col6:
+        st.markdown(f"**{format_cop(total_epc)}**")
+    with col7:
+        st.markdown(f"**{format_cop(total_client)}**")
+    with col8:
+        st.markdown("")  # Vacío para acción
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Alternative: Show as dataframe (simpler but less interactive)
+    # df = pd.DataFrame([{k: v for k, v in row.items() if not k.startswith('_')} for row in table_data])
+    # st.dataframe(df, use_container_width=True, hide_index=True)
+
+
+# ============================================================================
 # COMPARE TAB
 # ============================================================================
 
@@ -1176,7 +1450,7 @@ def render_compare():
         st.info("Necesitas al menos un proyecto para comparar.")
         return
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.subheader("Escenario A")
@@ -1204,46 +1478,200 @@ def render_compare():
         else:
             scenario_b_name = None
     
+    with col3:
+        st.subheader("Escenario C")
+        project_c_name = st.selectbox("Proyecto C", options=[p['name'] for p in projects], key="compare_project_c")
+        if project_c_name:
+            project_c = next(p for p in projects if p['name'] == project_c_name)
+            scenarios_c = get_scenarios_by_project(project_c['project_id'])
+            if scenarios_c:
+                scenario_c_name = st.selectbox("Escenario C", options=[s['name'] for s in scenarios_c], key="compare_scenario_c")
+            else:
+                scenario_c_name = None
+        else:
+            scenario_c_name = None
+    
+    with col4:
+        st.subheader("Escenario D")
+        project_d_name = st.selectbox("Proyecto D", options=[p['name'] for p in projects], key="compare_project_d")
+        if project_d_name:
+            project_d = next(p for p in projects if p['name'] == project_d_name)
+            scenarios_d = get_scenarios_by_project(project_d['project_id'])
+            if scenarios_d:
+                scenario_d_name = st.selectbox("Escenario D", options=[s['name'] for s in scenarios_d], key="compare_scenario_d")
+            else:
+                scenario_d_name = None
+        else:
+            scenario_d_name = None
+    
     # Compare
-    if scenario_a_name and scenario_b_name:
+    if scenario_a_name and scenario_b_name and scenario_c_name and scenario_d_name:
         scenario_a_id = next(s['scenario_id'] for s in scenarios_a if s['name'] == scenario_a_name)
         scenario_b_id = next(s['scenario_id'] for s in scenarios_b if s['name'] == scenario_b_name)
+        scenario_c_id = next(s['scenario_id'] for s in scenarios_c if s['name'] == scenario_c_name)
+        scenario_d_id = next(s['scenario_id'] for s in scenarios_d if s['name'] == scenario_d_name)
         
         scenario_a = load_scenario(scenario_a_id)
         scenario_b = load_scenario(scenario_b_id)
+        scenario_c = load_scenario(scenario_c_id)
+        scenario_d = load_scenario(scenario_d_id)
         
-        if scenario_a and scenario_b:
-            comparison = compare_scenarios(scenario_a, scenario_b)
+        if scenario_a and scenario_b and scenario_c and scenario_d:
+            comparison = compare_four_scenarios(scenario_a, scenario_b, scenario_c, scenario_d)
             
             st.divider()
             st.subheader("Comparación General")
             
-            st.markdown("**Escenario A:**")
-            col1, col2 = st.columns(2)
+            # Fila 1: Valor Total del Proyecto
+            st.markdown("**A) Valor Total del Proyecto**")
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                kpi_card("EPC A", format_cop(comparison['overall']['epc_total_a']))
+                kpi_card("Escenario A", format_cop(comparison['overall']['project_total_a']))
             with col2:
-                kpi_card("Proyecto A", format_cop(comparison['overall']['project_total_a']))
+                kpi_card("Escenario B", format_cop(comparison['overall']['project_total_b']))
+            with col3:
+                kpi_card("Escenario C", format_cop(comparison['overall']['project_total_c']))
+            with col4:
+                kpi_card("Escenario D", format_cop(comparison['overall']['project_total_d']))
             
-            st.markdown("**Escenario B:**")
-            col1, col2 = st.columns(2)
+            # Fila 2: Total Compra por Cliente
+            st.markdown("**B) Total Compra por Cliente**")
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                kpi_card("EPC B", format_cop(comparison['overall']['epc_total_b']))
+                kpi_card("Escenario A", format_cop(comparison['overall']['client_total_a']))
             with col2:
-                kpi_card("Proyecto B", format_cop(comparison['overall']['project_total_b']))
+                kpi_card("Escenario B", format_cop(comparison['overall']['client_total_b']))
+            with col3:
+                kpi_card("Escenario C", format_cop(comparison['overall']['client_total_c']))
+            with col4:
+                kpi_card("Escenario D", format_cop(comparison['overall']['client_total_d']))
             
-            st.markdown("**Deltas:**")
-            col1, col2 = st.columns(2)
+            # Fila 3: Total Valor EPC
+            st.markdown("**C) Total Valor EPC**")
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                kpi_card("Delta EPC", format_cop(comparison['overall']['epc_delta']), f"{comparison['overall']['epc_delta_pct']:.1f}%")
+                kpi_card("Escenario A", format_cop(comparison['overall']['epc_total_a']))
             with col2:
-                kpi_card("Delta Proyecto", format_cop(comparison['overall']['project_delta']), f"{comparison['overall']['project_delta_pct']:.1f}%")
+                kpi_card("Escenario B", format_cop(comparison['overall']['epc_total_b']))
+            with col3:
+                kpi_card("Escenario C", format_cop(comparison['overall']['epc_total_c']))
+            with col4:
+                kpi_card("Escenario D", format_cop(comparison['overall']['epc_total_d']))
+            
+            # Fila 4: COP/kWp Total Proyecto
+            st.markdown("**D) COP/kWp Total Proyecto**")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                kpi_card("Escenario A", format_cop(comparison['overall']['cop_per_kwp_a']) if comparison['overall']['cop_per_kwp_a'] > 0 else "N/A")
+            with col2:
+                kpi_card("Escenario B", format_cop(comparison['overall']['cop_per_kwp_b']) if comparison['overall']['cop_per_kwp_b'] > 0 else "N/A")
+            with col3:
+                kpi_card("Escenario C", format_cop(comparison['overall']['cop_per_kwp_c']) if comparison['overall']['cop_per_kwp_c'] > 0 else "N/A")
+            with col4:
+                kpi_card("Escenario D", format_cop(comparison['overall']['cop_per_kwp_d']) if comparison['overall']['cop_per_kwp_d'] > 0 else "N/A")
+            
+            # Fila 5: Potencia DC (kWp)
+            st.markdown("**E) Potencia DC (kWp)**")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                kpi_card("Escenario A", format_number(comparison['overall']['kwp_a'], decimals=2))
+            with col2:
+                kpi_card("Escenario B", format_number(comparison['overall']['kwp_b'], decimals=2))
+            with col3:
+                kpi_card("Escenario C", format_number(comparison['overall']['kwp_c'], decimals=2))
+            with col4:
+                kpi_card("Escenario D", format_number(comparison['overall']['kwp_d'], decimals=2))
+            
+            # Fila 6: P50 MWh/año
+            st.markdown("**F) P50 MWh/año**")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                kpi_card("Escenario A", format_number(comparison['overall']['p50_mwh_a'], decimals=2))
+            with col2:
+                kpi_card("Escenario B", format_number(comparison['overall']['p50_mwh_b'], decimals=2))
+            with col3:
+                kpi_card("Escenario C", format_number(comparison['overall']['p50_mwh_c'], decimals=2))
+            with col4:
+                kpi_card("Escenario D", format_number(comparison['overall']['p50_mwh_d'], decimals=2))
             
             st.divider()
             st.subheader("Por Categoría")
             
-            comparison_df = pd.DataFrame(comparison['by_category'])
+            # Sort categories: normal categories first, then AIU, then Total Proyecto
+            sorted_categories = []
+            aiu_category = None
+            total_project_category = None
+            
+            for cat in comparison['by_category']:
+                if cat['category_code'] == 'AIU':
+                    aiu_category = cat
+                elif cat['category_code'] == 'TOTAL_PROJECT':
+                    total_project_category = cat
+                else:
+                    sorted_categories.append(cat)
+            
+            # Add AIU and Total Proyecto at the end
+            if aiu_category:
+                sorted_categories.append(aiu_category)
+            if total_project_category:
+                sorted_categories.append(total_project_category)
+            
+            # Prepare data for table with Total A, Total B, Total C, Total D
+            category_data = []
+            for cat in sorted_categories:
+                category_data.append({
+                    'Categoría': cat['category_name'],
+                    'Total A': format_cop(cat['total_a']),
+                    'Total B': format_cop(cat['total_b']),
+                    'Total C': format_cop(cat['total_c']),
+                    'Total D': format_cop(cat['total_d'])
+                })
+            
+            comparison_df = pd.DataFrame(category_data)
             st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+            
+            # Gráfico de barras
+            st.divider()
+            st.subheader("Gráfico Comparativo por Categoría")
+            
+            # Preparar datos para el gráfico (usando categorías ordenadas)
+            chart_data = []
+            for cat in sorted_categories:
+                chart_data.append({
+                    'Categoría': cat['category_name'],
+                    'Escenario A': cat['total_a'],
+                    'Escenario B': cat['total_b'],
+                    'Escenario C': cat['total_c'],
+                    'Escenario D': cat['total_d']
+                })
+            
+            df_chart = pd.DataFrame(chart_data)
+            
+            # Crear gráfico de barras agrupadas
+            fig = px.bar(
+                df_chart,
+                x='Categoría',
+                y=['Escenario A', 'Escenario B', 'Escenario C', 'Escenario D'],
+                barmode='group',
+                title='Comparación de Totales por Categoría',
+                labels={'value': 'Valor Total (COP)', 'variable': 'Escenario'},
+                color_discrete_map={
+                    'Escenario A': '#0B7285',  # Delphi teal
+                    'Escenario B': '#075A66',  # Delphi teal dark
+                    'Escenario C': '#14A085',  # Alternative teal shade
+                    'Escenario D': '#0891B2'   # Another teal shade for D
+                }
+            )
+            
+            # Ajustar layout del gráfico
+            fig.update_layout(
+                xaxis_title="Categoría",
+                yaxis_title="Valor Total (COP)",
+                legend_title="Escenario",
+                hovermode='x unified'
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
 
 
 # ============================================================================
@@ -1254,10 +1682,16 @@ def main():
     """Main application entry point."""
     render_sidebar()
     
-    if not st.session_state.current_scenario_id:
-        st.info("👈 Selecciona un cliente, proyecto y escenario en el panel lateral para comenzar.")
+    if not st.session_state.current_client_id:
+        st.info("👈 Selecciona un cliente en el panel lateral para comenzar.")
         return
     
+    # Si hay cliente pero no escenario, mostrar vista de resumen
+    if not st.session_state.current_scenario_id:
+        render_projects_overview()
+        return
+    
+    # Si hay escenario seleccionado, mostrar tabs normales
     # Main tabs
     tab1, tab2, tab3 = st.tabs(["📝 Builder", "📚 Biblioteca", "⚖️ Comparar"])
     
