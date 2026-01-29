@@ -23,6 +23,33 @@ def inject_delphi_css():
             pass
 
 
+def login_form():
+    """Render a simple login form and handle authentication."""
+    import auth
+    st.markdown("## Iniciar sesión")
+    with st.form("login_form", clear_on_submit=False):
+        email = st.text_input("Correo electrónico", value="", key="login_email")
+        password = st.text_input("Contraseña", type="password", key="login_password")
+        submitted = st.form_submit_button("Entrar")
+        if submitted:
+            user = auth.authenticate(email.strip(), password)
+            if user:
+                st.session_state.user = user.to_dict()
+                st.success(f"Bienvenido {user.email}")
+                # Rerun so app shows content for authenticated user
+                st.experimental_rerun()
+            else:
+                st.error("Credenciales inválidas. Verifica email y contraseña.")
+
+
+def logout_button():
+    """Render a logout button in the UI (sidebar recommended)."""
+    if st.sidebar.button("Cerrar sesión"):
+        if 'user' in st.session_state:
+            del st.session_state['user']
+        st.experimental_rerun()
+
+
 def kpi_card(label: str, value: str, sub: str = ""):
     """Render a Delphi KPI card using HTML + CSS classes."""
     sub_html = f'<p class="delphi-card-sub">{sub}</p>' if sub else ''

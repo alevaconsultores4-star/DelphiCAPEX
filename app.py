@@ -35,12 +35,13 @@ from ui_components import (
     inject_delphi_css, kpi_card, category_band,
     render_metrics_tiles, render_subtotal_row, create_item_dataframe,
     render_item_table_readonly, render_commercial_details_drawer, render_aiu_breakdown,
-    render_epc_summary
+    render_epc_summary, login_form, logout_button
 )
 from uploads_service import upload_file, list_uploads, delete_upload, attach_upload_to_item
 from excel_export import export_to_excel, export_items_to_csv, export_summary_to_csv
 from compare_service import compare_scenarios, compare_four_scenarios
 from formatting import format_cop, format_number, format_percentage, parse_number
+import auth
 
 
 # Page config
@@ -63,6 +64,29 @@ if 'current_scenario_id' not in st.session_state:
     st.session_state.current_scenario_id = None
 if 'migration_done' not in st.session_state:
     st.session_state.migration_done = False
+if 'user' not in st.session_state:
+    st.session_state.user = None
+
+# Simple auth gating: if no user, show login form and return
+if not st.session_state.user:
+    # Provide a small sidebar note and show login in main area
+    st.sidebar.info("Inicia sesión para acceder a la aplicación.")
+    # Offer seed admin action for local setups (visible only when no users exist)
+    users_exist = False
+    try:
+        users_exist = bool(__import__('storage').get_user_by_email) and len(__import__('storage').load_users()) > 0
+    except Exception:
+        users_exist = False
+    if not users_exist:
+        st.info("No se encontraron usuarios. Puedes crear un administrador inicial localmente.")
+        if st.button("Crear admin local (delphi@delphi.local)"):
+            try:
+                admin = auth.seed_admin()
+                st.success(f"Admin creado: {admin.email}. Por favor cambia la contraseña.")
+            except Exception as e:
+                st.error(f"Error creando admin: {e}")
+    login_form()
+    st.stop()
 
 
 # ============================================================================

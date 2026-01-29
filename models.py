@@ -284,3 +284,32 @@ class UploadMetadata:
     def from_dict(cls, data: Dict[str, Any]) -> 'UploadMetadata':
         """Create from dictionary."""
         return cls(**data)
+
+
+@dataclass
+class User:
+    """User account for application access control."""
+    user_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    email: str = ""
+    password_hash: str = ""  # bcrypt hash
+    role: str = "client_viewer"  # e.g. 'delphi_admin' or 'client_viewer'
+    client_id: Optional[str] = None  # if role == client_viewer, restrict to this client
+    created_at: str = field(default_factory=lambda: datetime.now().isoformat())
+    updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'User':
+        """Create User from dictionary (tolerant to missing keys)."""
+        return cls(
+            user_id=data.get("user_id", str(uuid.uuid4())),
+            email=data.get("email", ""),
+            password_hash=data.get("password_hash", ""),
+            role=data.get("role", "client_viewer"),
+            client_id=data.get("client_id"),
+            created_at=data.get("created_at", datetime.now().isoformat()),
+            updated_at=data.get("updated_at", datetime.now().isoformat())
+        )

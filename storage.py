@@ -320,3 +320,73 @@ def get_all_projects() -> List[Dict]:
     """
     index = load_projects_index()
     return index.get("projects", [])
+
+
+# -------------------------
+# User persistence (simple JSON file)
+# -------------------------
+USERS_FILE = DATA_DIR / "users.json"
+
+
+def load_users() -> List[Dict]:
+    """Load users list from JSON file."""
+    ensure_data_dir()
+    if not USERS_FILE.exists():
+        return []
+    try:
+        with open(USERS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return []
+
+
+def save_users(users: List[Dict]):
+    """Save users list to JSON file."""
+    ensure_data_dir()
+    try:
+        with open(USERS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(users, f, indent=2, ensure_ascii=False)
+    except IOError as e:
+        raise Exception(f"Error saving users file: {e}")
+
+
+def get_user_by_email(email: str) -> Optional[Dict]:
+    """Return user dict by email (case-insensitive) or None."""
+    users = load_users()
+    email_lower = email.strip().lower()
+    for u in users:
+        if u.get("email", "").strip().lower() == email_lower:
+            return u
+    return None
+
+
+def create_user(user_dict: Dict) -> Dict:
+    """Create a new user and persist to users.json. Returns the created user dict."""
+    users = load_users()
+    users.append(user_dict)
+    save_users(users)
+    return user_dict
+
+
+def update_user(updated_user: Dict) -> Dict:
+    """Update an existing user by user_id or email. Returns updated user."""
+    users = load_users()
+    for i, u in enumerate(users):
+        if u.get("user_id") == updated_user.get("user_id") or (u.get("email") and updated_user.get("email") and u.get("email").lower() == updated_user.get("email").lower()):
+            users[i] = updated_user
+            save_users(users)
+            return updated_user
+    # If not found, append
+    users.append(updated_user)
+    save_users(users)
+    return updated_user
+
+
+def delete_user(user_id: str) -> bool:
+    """Delete user by user_id. Returns True if removed."""
+    users = load_users()
+    new_users = [u for u in users if u.get("user_id") != user_id]
+    if len(new_users) == len(users):
+        return False
+    save_users(new_users)
+    return True
