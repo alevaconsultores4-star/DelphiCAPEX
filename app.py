@@ -142,6 +142,19 @@ def render_sidebar():
         st.sidebar.info("No hay clientes. Crea uno nuevo.")
         st.session_state.current_client_id = None
     
+    # Logout button (if logged in)
+    try:
+        if st.session_state.user:
+            from ui_components import logout_button
+            st.sidebar.markdown(f"**Usuario:** {st.session_state.user.get('email')} — `{st.session_state.user.get('role')}`")
+            logout_button()
+            # Admin quick link
+            if st.session_state.user.get('role') == 'delphi_admin':
+                if st.sidebar.button("Administrar usuarios"):
+                    st.session_state.show_admin = True
+    except Exception:
+        pass
+    
     # Client management
     if st.sidebar.button("➕ Nuevo Cliente", key="btn_new_client"):
         st.session_state.show_new_client = True
@@ -1706,6 +1719,10 @@ def main():
     """Main application entry point."""
     render_sidebar()
     
+    # If admin requested user management, show admin panel
+    if st.session_state.get('show_admin'):
+        render_admin_panel()
+        return
     if not st.session_state.current_client_id:
         st.info("👈 Selecciona un cliente en el panel lateral para comenzar.")
         return
@@ -1727,6 +1744,81 @@ def main():
     
     with tab3:
         render_compare()
+
+
+def render_admin_panel():
+    """Admin panel for user management (Delphi admins only)."""
+    import storage
+    st.header("Administración de usuarios")
+    if not st.session_state.user or st.session_state.user.get('role') != 'delphi_admin':
+        st.error("Acceso denegado. Se requiere rol Delphi admin.")
+        return
+
+    users = storage.load_users()
+    # List users
+    st.subheader("Cuentas existentes")
+    for u in users:
+        cols = st.columns([3, 2, 1])
+        with cols[0]:
+            st.markdown(f"**{u.get('email','')}** — {u.get('role','')}")
+            if u.get('client_id'):
+                st.markdown(f"_Client:_ {u.get('client_id')}")
+        with cols[1]:
+            if st.button(f"Editar:{u.get('user_id')}", key=f"edit_user_{u.get('user_id')}"):
+                st.session_state.edit_user = u
+                st.experimental_rerun()
+        with cols[2]:
+            if st.button(f"Eliminar:{u.get('user_id')}", key=f"del_user_{u.get('user_id')}"):
+                storage.delete_user(u.get('user_id'))
+                st.success("Usuario eliminado")
+                st.experimental_rerun()
+
+    st.divider()
+    st.subheader("Crear nueva cuenta")
+    with st.form("create_user_form"):
+        email = st.text_input("Email", value="")
+        role = st.selectbox("Rol", options=["client_viewer", "delphi_admin"])
+        client_id = st.text_input("Client ID (opcional)", value="")
+        password = st.text_input("Contraseña inicial", type="password")
+        submitted = st.form_submit_button("Crear usuario")
+        if submitted:
+            if not email or not password:
+                st.error("Email y contraseña son requeridos.")
+            else:
+                import auth
+                new_user = models.User(
+                    email=email.strip(),
+                    password_hash=auth.hash_password(password),
+                    role=role,
+                    client_id=client_id.strip() or None
+                )
+                storage.create_user(new_user.to_dict())
+                st.success(f"Usuario creado: {email}")
+                st.experimental_rerun()
+
+    # Edit user drawer
+    if st.session_state.get('edit_user'):
+        u = st.session_state.get('edit_user')
+        st.subheader(f"Editar {u.get('email')}")
+        with st.form("edit_user_form"):
+            new_email = st.text_input("Email", value=u.get('email',''))
+            new_role = st.selectbox("Rol", options=["client_viewer", "delphi_admin"], index=0 if u.get('role','')=="client_viewer" else 1)
+            new_client = st.text_input("Client ID (opcional)", value=u.get('client_id') or "")
+            new_password = st.text_input("Nueva contraseña (dejar vacío = mantener)", type="password")
+            save = st.form_submit_button("Guardar cambios")
+            if save:
+                updated = u.copy()
+                updated['email'] = new_email.strip()
+                updated['role'] = new_role
+                updated['client_id'] = new_client.strip() or None
+                if new_password:
+                    import auth
+                    updated['password_hash'] = auth.hash_password(new_password)
+                updated['updated_at'] = datetime.now().isoformat()
+                storage.update_user(updated)
+                st.success("Usuario actualizado")
+                st.session_state.edit_user = None
+                st.experimental_rerun()
 
 
 if __name__ == "__main__":
