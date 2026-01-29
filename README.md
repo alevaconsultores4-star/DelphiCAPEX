@@ -164,6 +164,19 @@ Asegúrate de hacer clic en "💾 Guardar Cambios" en el panel lateral después 
 - Los datos se guardan en el servidor de Streamlit Cloud (no se persisten entre reinicios a menos que uses almacenamiento externo)
 - La variable `GEMINI_API_KEY` es opcional; sin ella, el análisis IA mostrará un mensaje informativo
 
+## Autenticación local (PoC)
+
+La aplicación soporta autenticación local basada en un fichero `data/users.json`. Para entornos internos o de prueba se usa bcrypt para hashear contraseñas.
+
+- Para crear un administrador inicial localmente, ejecuta la app y usa el botón **Crear admin local (delphi@delphi.local)** en la pantalla de login, o ejecuta desde un REPL:
+
+```python
+import auth
+auth.seed_admin(email="delphi@delphi.local", password="ChangeMe123!")
+```
+
+Recuerda cambiar la contraseña del administrador tras el primer inicio de sesión. Para producción se recomienda migrar a un proveedor de identidad (Supabase/Auth0) y habilitar MFA.
+
 ## Licencia
 
 Este proyecto es de uso interno.
