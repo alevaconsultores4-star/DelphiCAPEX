@@ -1,8 +1,8 @@
 [
   {
     "user_id": "f3976240-de7f-4820-aa4c-889f379b2ebb",
-    "email": "delphi@delphi.local",
-    "password_hash": "200000$cuW+wvHyYXAIvaKXyXDglA==$svig5euwkNq1bYGjDk7s/FqVPyqsXK88ORjLU8Vf1ps=",
+    "email": "aftorres@delphicp.com",
+    "password_hash": "200000$h5YMwaoTSxxDNhUMyF2Btw==$aQ5Fpq6xxkUck4ekNgCu2HzcK3RTYoYIKxCgLY36Uv8=",
     "role": "delphi_admin",
     "client_id": null,
     "created_at": "2026-01-29T10:13:52.762320",
