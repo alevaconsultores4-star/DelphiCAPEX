@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import hashlib
 import base64
+import re
 from typing import Tuple
 
 import models
@@ -19,6 +20,9 @@ try:
 except Exception:
     _USE_BCRYPT = False
     print("Warning: bcrypt not available, falling back to PBKDF2 (insecure compared to bcrypt). Install bcrypt for stronger hashing.")
+
+# Detect bcrypt-format hashes
+_BCRYPT_PREFIX = re.compile(r'^\$2[aby]\$')  # bcrypt prefix e.g. $2b$
 
 # PBKDF2 parameters (used when bcrypt unavailable)
 _ITERATIONS = 200_000
@@ -46,13 +50,19 @@ def verify_password(plain: str, hashed: str) -> bool:
     """Verify a plaintext password against a stored hash (bcrypt or PBKDF2)."""
     if not hashed:
         return False
-    if _USE_BCRYPT:
-        try:
-            return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
-        except Exception:
-            return False
-    # PBKDF2 fallback parsing: iterations$salt$b64hash
+
     try:
+        # If stored value looks like a bcrypt hash (starts with $2a/$2b/$2y), prefer bcrypt
+        if _BCRYPT_PREFIX.match(hashed):
+            # If bcrypt is available, validate; otherwise fail safe (cannot verify bcrypt)
+            if _USE_BCRYPT:
+                try:
+                    return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
+                except Exception:
+                    return False
+            return False
+
+        # Otherwise assume PBKDF2 format: iterations$salt$b64hash
         iterations_str, salt_b64, hash_b64 = hashed.split('$')
         iterations = int(iterations_str)
         salt = base64.b64decode(salt_b64)
