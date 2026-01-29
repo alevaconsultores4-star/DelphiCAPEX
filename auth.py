@@ -23,7 +23,7 @@ except Exception:
 # PBKDF2 parameters (used when bcrypt unavailable)
 _ITERATIONS = 200_000
 _SALT_BYTES = 16
-__HASH_NAME = "sha256"
+_HASH_NAME = "sha256"
 
 
 def hash_password(plain: str) -> str:
