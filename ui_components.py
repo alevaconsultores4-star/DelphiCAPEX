@@ -36,8 +36,14 @@ def login_form():
             if user:
                 st.session_state.user = user.to_dict()
                 st.success(f"Bienvenido {user.email}")
-                # Rerun so app shows content for authenticated user
-                st.experimental_rerun()
+                # Rerun so app shows content for authenticated user.
+                # Some Streamlit deployments may not expose `experimental_rerun`;
+                # fall back to setting a session flag and stopping execution.
+                if hasattr(st, "experimental_rerun") and callable(getattr(st, "experimental_rerun")):
+                    st.experimental_rerun()
+                else:
+                    st.session_state['_rerun_requested'] = True
+                    st.stop()
             else:
                 st.error("Credenciales inválidas. Verifica email y contraseña.")
 
@@ -47,7 +53,12 @@ def logout_button():
     if st.sidebar.button("Cerrar sesión"):
         if 'user' in st.session_state:
             del st.session_state['user']
-        st.experimental_rerun()
+        # Try to rerun, otherwise stop to force UI refresh on next interaction
+        if hasattr(st, "experimental_rerun") and callable(getattr(st, "experimental_rerun")):
+            st.experimental_rerun()
+        else:
+            st.session_state['_rerun_requested'] = True
+            st.stop()
 
 
 def kpi_card(label: str, value: str, sub: str = ""):
