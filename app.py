@@ -118,6 +118,14 @@ def render_sidebar():
     
     # CLIENT SELECTOR
     clients = get_all_clients()
+    # If logged in as a client viewer, restrict visible clients to their client_id
+    try:
+        if st.session_state.user and st.session_state.user.get('role') == 'client_viewer':
+            viewer_client = st.session_state.user.get('client_id')
+            if viewer_client:
+                clients = [c for c in clients if c.get('client_id') == viewer_client]
+    except Exception:
+        pass
     client_options = {c['name']: c['client_id'] for c in clients}
     
     if clients:
@@ -521,13 +529,16 @@ def render_capex_builder():
     
     st.header(f"📝 CAPEX Builder: {client.name if client else ''} → {project.name if project else ''} → {scenario.name}")
     
-    # Save button at the top
+    # Save button at the top (only for admins)
     col_save, col_spacer = st.columns([1, 5])
     with col_save:
-        if st.button("💾 Guardar Cambios", type="primary", key="save_changes_top", use_container_width=True):
-            save_scenario_changes(scenario)
-            st.success("✅ Cambios guardados")
-            st.rerun()
+        if st.session_state.user and st.session_state.user.get('role') == 'delphi_admin':
+            if st.button("💾 Guardar Cambios", type="primary", key="save_changes_top", use_container_width=True):
+                save_scenario_changes(scenario)
+                st.success("✅ Cambios guardados")
+                st.rerun()
+        else:
+            st.info("Estás en modo lectura. Solo los administradores pueden guardar cambios.")
     
     # Create temporary scenario with current widget values for live totals
     # Read directly from widget session state keys to get most recent values
