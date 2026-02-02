@@ -480,13 +480,72 @@ def render_sidebar():
                             if st.button("✅ Confirmar eliminación", type="primary", key=f"btn_confirm_delete_{scenario.scenario_id}"):
                                 if confirm_text.strip() == scenario.name.strip():
                                     try:
-                                        delete_scenario(scenario.scenario_id)
-                                        st.session_state.current_scenario_id = None
-                                        st.session_state[delete_key] = False
-                                        st.sidebar.success(f"✅ Escenario '{scenario.name}' eliminado")
-                                        st.rerun()
+                                        # Delete the scenario file
+                                        success = delete_scenario(scenario.scenario_id)
+                                        
+                                        if success:
+                                            # Clear all session state related to this scenario
+                                            scenario_id = scenario.scenario_id
+                                            
+                                            # Clear current scenario if it's the one being deleted
+                                            if st.session_state.get('current_scenario_id') == scenario_id:
+                                                st.session_state.current_scenario_id = None
+                                            
+                                            # Clear all item-related session state for this scenario
+                                            keys_to_remove = []
+                                            for key in st.session_state.keys():
+                                                # Remove item keys that might be related to this scenario
+                                                if key.startswith('item_') or \
+                                                   key.startswith('qty_') or \
+                                                   key.startswith('price_') or \
+                                                   key.startswith('vat_') or \
+                                                   key.startswith('mode_') or \
+                                                   key.startswith('client_') or \
+                                                   key.startswith('code_') or \
+                                                   key.startswith('name_') or \
+                                                   key.startswith('unit_') or \
+                                                   key.startswith('price_includes_vat_') or \
+                                                   key.startswith('edit_item_') or \
+                                                   key.startswith('show_lib_') or \
+                                                   key.startswith('confirm_delete_text_') or \
+                                                   key.startswith('btn_confirm_delete_') or \
+                                                   key.startswith('btn_cancel_delete_'):
+                                                    keys_to_remove.append(key)
+                                            
+                                            # Clear AIU and VAT config keys for this scenario
+                                            for key in list(st.session_state.keys()):
+                                                if key.startswith(f'aiu_enabled_{scenario_id}') or \
+                                                   key.startswith(f'admin_pct_{scenario_id}') or \
+                                                   key.startswith(f'imprev_pct_{scenario_id}') or \
+                                                   key.startswith(f'util_pct_{scenario_id}') or \
+                                                   key.startswith(f'vat_recoverable_{scenario_id}') or \
+                                                   key.startswith(f'vat_on_util_{scenario_id}') or \
+                                                   key.startswith(f'vat_rate_util_{scenario_id}'):
+                                                    keys_to_remove.append(key)
+                                            
+                                            # Remove all identified keys
+                                            for key in keys_to_remove:
+                                                if key in st.session_state:
+                                                    del st.session_state[key]
+                                            
+                                            # Clear delete confirmation state
+                                            st.session_state[delete_key] = False
+                                            
+                                            # Clear any cached scenario data
+                                            if hasattr(st, 'cache_data'):
+                                                try:
+                                                    st.cache_data.clear()
+                                                except:
+                                                    pass
+                                            
+                                            st.sidebar.success(f"✅ Escenario '{scenario.name}' eliminado correctamente")
+                                            
+                                            # Force rerun to refresh the UI
+                                            st.rerun()
+                                        else:
+                                            st.sidebar.error(f"❌ No se pudo eliminar el escenario. El archivo no existe o ya fue eliminado.")
                                     except Exception as e:
-                                        st.sidebar.error(f"Error: {e}")
+                                        st.sidebar.error(f"❌ Error al eliminar escenario: {e}")
                                 else:
                                     st.sidebar.error(f"❌ El nombre no coincide. Escribiste: '{confirm_text}', pero el nombre es: '{scenario.name}'")
                         with col_cancel:
@@ -565,23 +624,23 @@ def save_scenario_changes(scenario: Scenario):
             item.client_pays = st.session_state[widget_client_key]
         elif item_key in st.session_state:
             item.client_pays = st.session_state[item_key].get('client_pays', item.client_pays)
-            
-            # Apply commercial details
-            if 'commercial' in changes:
-                comm = changes['commercial']
-                item.incoterm = comm.get('incoterm', item.incoterm)
-                item.includes_installation = comm.get('includes_installation', item.includes_installation)
-                item.includes_transport = comm.get('includes_transport', item.includes_transport)
-                item.delivery_point = comm.get('delivery_point', item.delivery_point)
-                item.includes_commissioning = comm.get('includes_commissioning', item.includes_commissioning)
-                item.notes = comm.get('notes', item.notes)
-            
-            # Apply AIU factors
-            if 'aiu_factors' in changes:
-                factors = changes['aiu_factors']
-                item.aiu_factors.admin_factor = factors.get('admin_factor', item.aiu_factors.admin_factor)
-                item.aiu_factors.imprev_factor = factors.get('imprev_factor', item.aiu_factors.imprev_factor)
-                item.aiu_factors.util_factor = factors.get('util_factor', item.aiu_factors.util_factor)
+        
+        # Apply commercial details from session state
+        if item_key in st.session_state and 'commercial' in st.session_state[item_key]:
+            comm = st.session_state[item_key]['commercial']
+            item.incoterm = comm.get('incoterm', item.incoterm)
+            item.includes_installation = comm.get('includes_installation', item.includes_installation)
+            item.includes_transport = comm.get('includes_transport', item.includes_transport)
+            item.delivery_point = comm.get('delivery_point', item.delivery_point)
+            item.includes_commissioning = comm.get('includes_commissioning', item.includes_commissioning)
+            item.notes = comm.get('notes', item.notes)
+        
+        # Apply AIU factors from session state
+        if item_key in st.session_state and 'aiu_factors' in st.session_state[item_key]:
+            factors = st.session_state[item_key]['aiu_factors']
+            item.aiu_factors.admin_factor = factors.get('admin_factor', item.aiu_factors.admin_factor)
+            item.aiu_factors.imprev_factor = factors.get('imprev_factor', item.aiu_factors.imprev_factor)
+            item.aiu_factors.util_factor = factors.get('util_factor', item.aiu_factors.util_factor)
     
     # Apply variable changes from session state
     if 'p50_input' in st.session_state:

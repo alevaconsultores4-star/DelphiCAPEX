@@ -280,14 +280,39 @@ def create_scenario(project_id: str, name: str) -> Scenario:
 
 
 def save_scenario(scenario: Scenario):
-    """Save a scenario."""
+    """Save a scenario with error handling and validation."""
     ensure_directories()
     scenario.updated_at = datetime.now().isoformat()
     
     # Save scenario file
     scenario_file = SCENARIOS_DIR / f"{scenario.scenario_id}.json"
-    with open(scenario_file, 'w', encoding='utf-8') as f:
-        json.dump(scenario.to_dict(), f, indent=2, ensure_ascii=False)
+    try:
+        with open(scenario_file, 'w', encoding='utf-8') as f:
+            json.dump(scenario.to_dict(), f, indent=2, ensure_ascii=False)
+            f.flush()  # Force write to disk immediately
+            try:
+                # Ensure OS writes to disk (Unix/Windows)
+                # Note: os.fsync() may not be available on all platforms
+                if hasattr(os, 'fsync'):
+                    os.fsync(f.fileno())
+            except (OSError, AttributeError):
+                # On some systems (e.g., Windows), fsync may fail
+                # The flush() above should be sufficient in most cases
+                pass
+        
+        # Validate that file was written correctly
+        if not scenario_file.exists():
+            raise IOError(f"Scenario file was not created: {scenario_file}")
+        
+        # Verify file is readable
+        try:
+            with open(scenario_file, 'r', encoding='utf-8') as f:
+                json.load(f)
+        except json.JSONDecodeError as e:
+            raise IOError(f"Scenario file is corrupted after write: {e}")
+            
+    except (IOError, OSError, json.JSONEncodeError) as e:
+        raise Exception(f"Error saving scenario {scenario.scenario_id}: {e}")
 
 
 def load_scenario(scenario_id: str) -> Optional[Scenario]:
@@ -324,12 +349,27 @@ def get_scenarios_by_project(project_id: str) -> List[Dict]:
     return scenarios
 
 
-def delete_scenario(scenario_id: str):
-    """Delete a scenario."""
+def delete_scenario(scenario_id: str) -> bool:
+    """
+    Delete a scenario.
+    Returns True if successfully deleted, False otherwise.
+    """
     ensure_directories()
     scenario_file = SCENARIOS_DIR / f"{scenario_id}.json"
-    if scenario_file.exists():
+    
+    if not scenario_file.exists():
+        return False  # Already deleted or never existed
+    
+    try:
         scenario_file.unlink()
+        
+        # Verify file was actually deleted
+        if scenario_file.exists():
+            raise IOError(f"Scenario file still exists after deletion attempt: {scenario_file}")
+        
+        return True
+    except (OSError, IOError) as e:
+        raise Exception(f"Error deleting scenario {scenario_id}: {e}")
 
 
 def duplicate_scenario(scenario_id: str, new_name: str) -> Scenario:
