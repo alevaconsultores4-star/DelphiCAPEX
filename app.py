@@ -494,23 +494,24 @@ def save_scenario_changes(scenario: Scenario):
     if 'fx_rate_input' in st.session_state:
         scenario.variables.fx_rate = st.session_state['fx_rate_input']
     
-    # Apply AIU config changes
-    if 'aiu_enabled' in st.session_state:
-        scenario.aiu_config.enabled = st.session_state['aiu_enabled']
-    if 'admin_pct' in st.session_state:
-        scenario.aiu_config.admin_pct = st.session_state['admin_pct']
-    if 'imprev_pct' in st.session_state:
-        scenario.aiu_config.imprev_pct = st.session_state['imprev_pct']
-    if 'util_pct' in st.session_state:
-        scenario.aiu_config.util_pct = st.session_state['util_pct']
+    # Apply AIU config changes (use scenario_id-specific keys)
+    scenario_id = scenario.scenario_id
+    if f'aiu_enabled_{scenario_id}' in st.session_state:
+        scenario.aiu_config.enabled = st.session_state[f'aiu_enabled_{scenario_id}']
+    if f'admin_pct_{scenario_id}' in st.session_state:
+        scenario.aiu_config.admin_pct = st.session_state[f'admin_pct_{scenario_id}']
+    if f'imprev_pct_{scenario_id}' in st.session_state:
+        scenario.aiu_config.imprev_pct = st.session_state[f'imprev_pct_{scenario_id}']
+    if f'util_pct_{scenario_id}' in st.session_state:
+        scenario.aiu_config.util_pct = st.session_state[f'util_pct_{scenario_id}']
     
-    # Apply VAT config changes
-    if 'vat_recoverable' in st.session_state:
-        scenario.vat_config.vat_recoverable = st.session_state['vat_recoverable']
-    if 'vat_on_util' in st.session_state:
-        scenario.vat_config.vat_on_utilidad_enabled = st.session_state['vat_on_util']
-    if 'vat_rate_util' in st.session_state:
-        scenario.vat_config.vat_rate_utilidad = st.session_state['vat_rate_util']
+    # Apply VAT config changes (use scenario_id-specific keys)
+    if f'vat_recoverable_{scenario_id}' in st.session_state:
+        scenario.vat_config.vat_recoverable = st.session_state[f'vat_recoverable_{scenario_id}']
+    if f'vat_on_util_{scenario_id}' in st.session_state:
+        scenario.vat_config.vat_on_utilidad_enabled = st.session_state[f'vat_on_util_{scenario_id}']
+    if f'vat_rate_util_{scenario_id}' in st.session_state:
+        scenario.vat_config.vat_rate_utilidad = st.session_state[f'vat_rate_util_{scenario_id}']
     
     # Save the scenario
     save_scenario(scenario)
@@ -543,6 +544,24 @@ def render_capex_builder():
     # Create temporary scenario with current widget values for live totals
     # Read directly from widget session state keys to get most recent values
     temp_scenario = Scenario.from_dict(scenario.to_dict())
+    
+    # Update AIU and VAT config from session state (using scenario_id-specific keys)
+    scenario_id = temp_scenario.scenario_id
+    if f'aiu_enabled_{scenario_id}' in st.session_state:
+        temp_scenario.aiu_config.enabled = st.session_state[f'aiu_enabled_{scenario_id}']
+    if f'admin_pct_{scenario_id}' in st.session_state:
+        temp_scenario.aiu_config.admin_pct = st.session_state[f'admin_pct_{scenario_id}']
+    if f'imprev_pct_{scenario_id}' in st.session_state:
+        temp_scenario.aiu_config.imprev_pct = st.session_state[f'imprev_pct_{scenario_id}']
+    if f'util_pct_{scenario_id}' in st.session_state:
+        temp_scenario.aiu_config.util_pct = st.session_state[f'util_pct_{scenario_id}']
+    if f'vat_recoverable_{scenario_id}' in st.session_state:
+        temp_scenario.vat_config.vat_recoverable = st.session_state[f'vat_recoverable_{scenario_id}']
+    if f'vat_on_util_{scenario_id}' in st.session_state:
+        temp_scenario.vat_config.vat_on_utilidad_enabled = st.session_state[f'vat_on_util_{scenario_id}']
+    if f'vat_rate_util_{scenario_id}' in st.session_state:
+        temp_scenario.vat_config.vat_rate_utilidad = st.session_state[f'vat_rate_util_{scenario_id}']
+    
     for item in temp_scenario.items:
         item_key = f"item_{item.item_id}"
         
@@ -681,21 +700,24 @@ def render_capex_builder():
     st.subheader("Configuración AIU")
     col1, col2, col3, col4 = st.columns(4)
     
+    # Use scenario_id in keys to make them unique per scenario
+    scenario_id = scenario.scenario_id
+    
     with col1:
-        aiu_enabled = st.checkbox("Habilitar AIU", value=scenario.aiu_config.enabled, key="aiu_enabled")
-        admin_pct = st.number_input("Admin %", value=scenario.aiu_config.admin_pct, format="%.2f", key="admin_pct")
+        aiu_enabled = st.checkbox("Habilitar AIU", value=scenario.aiu_config.enabled, key=f"aiu_enabled_{scenario_id}")
+        admin_pct = st.number_input("Admin %", value=scenario.aiu_config.admin_pct, format="%.2f", key=f"admin_pct_{scenario_id}")
     
     with col2:
-        imprev_pct = st.number_input("Imprev %", value=scenario.aiu_config.imprev_pct, format="%.2f", key="imprev_pct")
-        util_pct = st.number_input("Util %", value=scenario.aiu_config.util_pct, format="%.2f", key="util_pct")
+        imprev_pct = st.number_input("Imprev %", value=scenario.aiu_config.imprev_pct, format="%.2f", key=f"imprev_pct_{scenario_id}")
+        util_pct = st.number_input("Util %", value=scenario.aiu_config.util_pct, format="%.2f", key=f"util_pct_{scenario_id}")
     
     with col3:
-        vat_recoverable = st.checkbox("IVA Recuperable", value=scenario.vat_config.vat_recoverable, key="vat_recoverable")
-        vat_on_util = st.checkbox("IVA sobre Utilidad", value=scenario.vat_config.vat_on_utilidad_enabled, key="vat_on_util")
+        vat_recoverable = st.checkbox("IVA Recuperable", value=scenario.vat_config.vat_recoverable, key=f"vat_recoverable_{scenario_id}")
+        vat_on_util = st.checkbox("IVA sobre Utilidad", value=scenario.vat_config.vat_on_utilidad_enabled, key=f"vat_on_util_{scenario_id}")
     
     with col4:
         if vat_on_util:
-            vat_rate_util = st.number_input("IVA Rate Utilidad %", value=scenario.vat_config.vat_rate_utilidad, format="%.2f", key="vat_rate_util")
+            vat_rate_util = st.number_input("IVA Rate Utilidad %", value=scenario.vat_config.vat_rate_utilidad, format="%.2f", key=f"vat_rate_util_{scenario_id}")
         else:
             vat_rate_util = scenario.vat_config.vat_rate_utilidad
     
