@@ -1820,14 +1820,45 @@ def render_compare():
             for cat in sorted_categories:
                 category_data.append({
                     'Categoría': cat['category_name'],
-                    'Total A': format_cop(cat['total_a']),
-                    'Total B': format_cop(cat['total_b']),
-                    'Total C': format_cop(cat['total_c']),
-                    'Total D': format_cop(cat['total_d'])
+                    'Total A': cat['total_a'],  # Keep as float for sorting
+                    'Total B': cat['total_b'],
+                    'Total C': cat['total_c'],
+                    'Total D': cat['total_d']
                 })
             
+            # Sorting controls
+            st.markdown("### Ordenar tabla")
+            col_sort1, col_sort2 = st.columns(2)
+            with col_sort1:
+                sort_column = st.selectbox(
+                    "Ordenar por columna:",
+                    options=['Categoría', 'Total A', 'Total B', 'Total C', 'Total D'],
+                    key="compare_sort_column"
+                )
+            with col_sort2:
+                sort_direction = st.selectbox(
+                    "Dirección:",
+                    options=['Ascendente (menor a mayor)', 'Descendente (mayor a menor)'],
+                    key="compare_sort_direction"
+                )
+            
+            # Apply sorting
             comparison_df = pd.DataFrame(category_data)
-            st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+            ascending = sort_direction == 'Ascendente (menor a mayor)'
+            
+            if sort_column == 'Categoría':
+                comparison_df = comparison_df.sort_values(by='Categoría', ascending=ascending)
+            else:
+                comparison_df = comparison_df.sort_values(by=sort_column, ascending=ascending)
+            
+            # Format values for display (after sorting)
+            display_df = comparison_df.copy()
+            display_df['Total A'] = display_df['Total A'].apply(lambda x: format_cop(x))
+            display_df['Total B'] = display_df['Total B'].apply(lambda x: format_cop(x))
+            display_df['Total C'] = display_df['Total C'].apply(lambda x: format_cop(x))
+            display_df['Total D'] = display_df['Total D'].apply(lambda x: format_cop(x))
+            
+            st.dataframe(display_df, use_container_width=True, hide_index=True)
             
             # Gráfico de barras
             st.divider()
