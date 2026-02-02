@@ -428,15 +428,27 @@ def render_sidebar():
                             st.rerun()
                     
                     # Delete
-                    if st.sidebar.button("🗑️ Eliminar Escenario", type="secondary", key="btn_delete_scenario"):
-                        if st.sidebar.checkbox("Confirmar eliminación", key="confirm_delete_scenario"):
+                    st.sidebar.markdown("---")
+                    st.sidebar.markdown(f"**⚠️ Eliminar Escenario:**")
+                    st.sidebar.markdown(f"*Escenario actual: **{scenario.name}***")
+                    
+                    if st.sidebar.button("🗑️ Eliminar este escenario", type="secondary", key="btn_delete_scenario"):
+                        st.sidebar.warning(f"⚠️ Estás a punto de eliminar: **{scenario.name}**")
+                        confirm_text = st.sidebar.text_input(
+                            f"Escribe el nombre del escenario para confirmar:",
+                            key="confirm_delete_text",
+                            placeholder=scenario.name
+                        )
+                        if confirm_text == scenario.name:
                             try:
                                 delete_scenario(scenario.scenario_id)
                                 st.session_state.current_scenario_id = None
-                                st.sidebar.success("Escenario eliminado")
+                                st.sidebar.success(f"✅ Escenario '{scenario.name}' eliminado")
                                 st.rerun()
                             except Exception as e:
                                 st.sidebar.error(f"Error: {e}")
+                        elif confirm_text:
+                            st.sidebar.error("❌ El nombre no coincide. No se eliminó nada.")
 
 
 # ============================================================================
