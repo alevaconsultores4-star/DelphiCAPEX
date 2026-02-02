@@ -332,9 +332,38 @@ def render_sidebar():
                     key="scenario_selector"
                 )
                 
+                # Track previous scenario to detect changes
+                previous_scenario_id = st.session_state.get('current_scenario_id')
+                
                 if selected_scenario_name:
-                    st.session_state.current_scenario_id = scenario_options[selected_scenario_name]
+                    new_scenario_id = scenario_options[selected_scenario_name]
+                    # If scenario changed, save previous scenario and clear item session state
+                    if previous_scenario_id and previous_scenario_id != new_scenario_id:
+                        # Save previous scenario before switching
+                        try:
+                            prev_scenario = load_scenario(previous_scenario_id)
+                            if prev_scenario:
+                                save_scenario_changes(prev_scenario)
+                        except Exception:
+                            pass  # Ignore errors if scenario doesn't exist
+                        # Clear item-related session state from previous scenario
+                        keys_to_remove = [key for key in st.session_state.keys() if key.startswith('item_') or key.startswith('qty_') or key.startswith('price_') or key.startswith('vat_') or key.startswith('mode_') or key.startswith('client_') or key.startswith('code_') or key.startswith('name_') or key.startswith('unit_') or key.startswith('price_includes_vat_') or key.startswith('edit_item_')]
+                        for key in keys_to_remove:
+                            del st.session_state[key]
+                    st.session_state.current_scenario_id = new_scenario_id
                 else:
+                    # If scenario was deselected, save previous scenario before clearing
+                    if previous_scenario_id:
+                        try:
+                            prev_scenario = load_scenario(previous_scenario_id)
+                            if prev_scenario:
+                                save_scenario_changes(prev_scenario)
+                        except Exception:
+                            pass
+                        # Clear item-related session state
+                        keys_to_remove = [key for key in st.session_state.keys() if key.startswith('item_') or key.startswith('qty_') or key.startswith('price_') or key.startswith('vat_') or key.startswith('mode_') or key.startswith('client_') or key.startswith('code_') or key.startswith('name_') or key.startswith('unit_') or key.startswith('price_includes_vat_') or key.startswith('edit_item_')]
+                        for key in keys_to_remove:
+                            del st.session_state[key]
                     st.session_state.current_scenario_id = None
             else:
                 st.sidebar.info("No hay escenarios. Crea uno nuevo.")
@@ -461,19 +490,66 @@ def save_scenario_changes(scenario: Scenario):
     Applies all tracked changes to items, variables, and configs.
     """
     # Apply all tracked changes to items
+    # Read from widget keys directly (most recent values) or fallback to nested session state
     for item in scenario.items:
         item_key = f"item_{item.item_id}"
-        if item_key in st.session_state:
-            changes = st.session_state[item_key]
-            item.item_code = changes.get('code', item.item_code)
-            item.name = changes.get('name', item.name)
-            item.qty = changes.get('qty', item.qty)
-            item.unit = changes.get('unit', item.unit)
-            item.pricing_mode = changes.get('pricing_mode', item.pricing_mode)
-            item.price = changes.get('price', item.price)
-            item.vat_rate = changes.get('vat_rate', item.vat_rate)
-            item.price_includes_vat = changes.get('price_includes_vat', getattr(item, 'price_includes_vat', False))
-            item.client_pays = changes.get('client_pays', item.client_pays)
+        widget_code_key = f"code_{item.item_id}"
+        widget_name_key = f"name_{item.item_id}"
+        widget_qty_key = f"qty_{item.item_id}"
+        widget_unit_key = f"unit_{item.item_id}"
+        widget_mode_key = f"mode_{item.item_id}"
+        widget_price_key = f"price_{item.item_id}"
+        widget_vat_key = f"vat_{item.item_id}"
+        widget_price_includes_vat_key = f"price_includes_vat_{item.item_id}"
+        widget_client_key = f"client_{item.item_id}"
+        
+        # Read from widget keys (most recent) or fallback to nested session state
+        if widget_code_key in st.session_state:
+            item.item_code = st.session_state[widget_code_key]
+        elif item_key in st.session_state:
+            item.item_code = st.session_state[item_key].get('code', item.item_code)
+            
+        if widget_name_key in st.session_state:
+            item.name = st.session_state[widget_name_key]
+        elif item_key in st.session_state:
+            item.name = st.session_state[item_key].get('name', item.name)
+            
+        if widget_qty_key in st.session_state:
+            item.qty = st.session_state[widget_qty_key]
+        elif item_key in st.session_state:
+            item.qty = st.session_state[item_key].get('qty', item.qty)
+            
+        if widget_unit_key in st.session_state:
+            item.unit = st.session_state[widget_unit_key]
+        elif item_key in st.session_state:
+            item.unit = st.session_state[item_key].get('unit', item.unit)
+            
+        if widget_mode_key in st.session_state:
+            item.pricing_mode = st.session_state[widget_mode_key]
+        elif item_key in st.session_state:
+            item.pricing_mode = st.session_state[item_key].get('pricing_mode', item.pricing_mode)
+            
+        if widget_price_key in st.session_state:
+            item.price = st.session_state[widget_price_key]
+        elif item_key in st.session_state:
+            item.price = st.session_state[item_key].get('price', item.price)
+            
+        if widget_vat_key in st.session_state:
+            item.vat_rate = st.session_state[widget_vat_key]
+        elif item_key in st.session_state:
+            item.vat_rate = st.session_state[item_key].get('vat_rate', item.vat_rate)
+            
+        if widget_price_includes_vat_key in st.session_state:
+            item.price_includes_vat = st.session_state[widget_price_includes_vat_key]
+        elif item_key in st.session_state:
+            item.price_includes_vat = st.session_state[item_key].get('price_includes_vat', getattr(item, 'price_includes_vat', False))
+        else:
+            item.price_includes_vat = getattr(item, 'price_includes_vat', False)
+            
+        if widget_client_key in st.session_state:
+            item.client_pays = st.session_state[widget_client_key]
+        elif item_key in st.session_state:
+            item.client_pays = st.session_state[item_key].get('client_pays', item.client_pays)
             
             # Apply commercial details
             if 'commercial' in changes:
@@ -967,6 +1043,19 @@ def render_capex_builder():
                         order=len(scenario.items)
                     )
                     scenario.items.append(new_item)
+                    # Initialize session state for new item immediately
+                    item_key = f"item_{new_item.item_id}"
+                    st.session_state[item_key] = {
+                        'code': new_item.item_code,
+                        'name': new_item.name,
+                        'qty': new_item.qty,
+                        'unit': new_item.unit,
+                        'pricing_mode': new_item.pricing_mode,
+                        'price': new_item.price,
+                        'vat_rate': new_item.vat_rate,
+                        'price_includes_vat': getattr(new_item, 'price_includes_vat', False),
+                        'client_pays': new_item.client_pays
+                    }
                     save_scenario(scenario)
                     st.rerun()
             
@@ -1006,6 +1095,19 @@ def render_capex_builder():
                                 scenario_item = add_item_from_library(selected_lib_item, scenario)
                                 if scenario_item:
                                     scenario.items.append(scenario_item)
+                                    # Initialize session state for new item immediately
+                                    item_key = f"item_{scenario_item.item_id}"
+                                    st.session_state[item_key] = {
+                                        'code': scenario_item.item_code,
+                                        'name': scenario_item.name,
+                                        'qty': scenario_item.qty,
+                                        'unit': scenario_item.unit,
+                                        'pricing_mode': scenario_item.pricing_mode,
+                                        'price': scenario_item.price,
+                                        'vat_rate': scenario_item.vat_rate,
+                                        'price_includes_vat': getattr(scenario_item, 'price_includes_vat', False),
+                                        'client_pays': scenario_item.client_pays
+                                    }
                                     save_scenario(scenario)
                                     st.session_state[f"show_lib_{category.category_code}"] = False
                                     st.rerun()
