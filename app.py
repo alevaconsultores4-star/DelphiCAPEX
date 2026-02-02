@@ -461,23 +461,38 @@ def render_sidebar():
                     st.sidebar.markdown(f"**⚠️ Eliminar Escenario:**")
                     st.sidebar.markdown(f"*Escenario actual: **{scenario.name}***")
                     
+                    # Use session state to track if delete confirmation is shown
+                    delete_key = f"show_delete_scenario_{scenario.scenario_id}"
+                    
                     if st.sidebar.button("🗑️ Eliminar este escenario", type="secondary", key="btn_delete_scenario"):
+                        st.session_state[delete_key] = True
+                    
+                    if st.session_state.get(delete_key, False):
                         st.sidebar.warning(f"⚠️ Estás a punto de eliminar: **{scenario.name}**")
                         confirm_text = st.sidebar.text_input(
                             f"Escribe el nombre del escenario para confirmar:",
-                            key="confirm_delete_text",
+                            key=f"confirm_delete_text_{scenario.scenario_id}",
                             placeholder=scenario.name
                         )
-                        if confirm_text == scenario.name:
-                            try:
-                                delete_scenario(scenario.scenario_id)
-                                st.session_state.current_scenario_id = None
-                                st.sidebar.success(f"✅ Escenario '{scenario.name}' eliminado")
+                        
+                        col_confirm, col_cancel = st.sidebar.columns(2)
+                        with col_confirm:
+                            if st.button("✅ Confirmar eliminación", type="primary", key=f"btn_confirm_delete_{scenario.scenario_id}"):
+                                if confirm_text.strip() == scenario.name.strip():
+                                    try:
+                                        delete_scenario(scenario.scenario_id)
+                                        st.session_state.current_scenario_id = None
+                                        st.session_state[delete_key] = False
+                                        st.sidebar.success(f"✅ Escenario '{scenario.name}' eliminado")
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.sidebar.error(f"Error: {e}")
+                                else:
+                                    st.sidebar.error(f"❌ El nombre no coincide. Escribiste: '{confirm_text}', pero el nombre es: '{scenario.name}'")
+                        with col_cancel:
+                            if st.button("❌ Cancelar", key=f"btn_cancel_delete_{scenario.scenario_id}"):
+                                st.session_state[delete_key] = False
                                 st.rerun()
-                            except Exception as e:
-                                st.sidebar.error(f"Error: {e}")
-                        elif confirm_text:
-                            st.sidebar.error("❌ El nombre no coincide. No se eliminó nada.")
 
 
 # ============================================================================
