@@ -665,6 +665,8 @@ def save_scenario_changes(scenario: Scenario):
             item.aiu_factors.util_factor = factors.get('util_factor', item.aiu_factors.util_factor)
     
     # Apply variable changes from session state (use scenario-specific keys)
+    # IMPORTANT: Only update if keys exist in session_state (user has interacted with widgets)
+    # Otherwise, keep the existing values from the loaded scenario to prevent data loss
     scenario_id = scenario.scenario_id
     p50_key = f"p50_input_{scenario_id}"
     p90_key = f"p90_input_{scenario_id}"
@@ -674,8 +676,11 @@ def save_scenario_changes(scenario: Scenario):
     fx_rate_key = f"fx_rate_input_{scenario_id}"
     
     # Read from scenario-specific keys (most recent widget values)
+    # Only update if the key exists (user has interacted with the widget)
+    # This preserves existing data if widgets haven't been interacted with yet
     if p50_key in st.session_state:
         scenario.variables.p50_mwh_per_year = st.session_state[p50_key]
+    # else: keep existing value from loaded scenario
     if p90_key in st.session_state:
         scenario.variables.p90_mwh_per_year = st.session_state[p90_key]
     if ac_power_key in st.session_state:
@@ -852,27 +857,43 @@ def render_capex_builder():
     currency_key = f"currency_input_{scenario_id}"
     fx_rate_key = f"fx_rate_input_{scenario_id}"
     
+    # Initialize session_state with current scenario values if not already set
+    # This ensures values are preserved even if user hasn't interacted with widgets yet
+    if p50_key not in st.session_state:
+        st.session_state[p50_key] = scenario.variables.p50_mwh_per_year
+    if p90_key not in st.session_state:
+        st.session_state[p90_key] = scenario.variables.p90_mwh_per_year
+    if ac_power_key not in st.session_state:
+        st.session_state[ac_power_key] = scenario.variables.ac_power_mw
+    if dc_power_key not in st.session_state:
+        st.session_state[dc_power_key] = scenario.variables.dc_power_mwp
+    if currency_key not in st.session_state:
+        st.session_state[currency_key] = scenario.variables.currency
+    if fx_rate_key not in st.session_state:
+        st.session_state[fx_rate_key] = scenario.variables.fx_rate
+    
     with col1:
-        p50 = st.number_input("P50 MWh/año", value=scenario.variables.p50_mwh_per_year, format="%.2f", key=p50_key)
-        ac_power = st.number_input("Potencia AC (MW)", value=scenario.variables.ac_power_mw, format="%.2f", key=ac_power_key)
+        p50 = st.number_input("P50 MWh/año", value=st.session_state[p50_key], format="%.2f", key=p50_key)
+        ac_power = st.number_input("Potencia AC (MW)", value=st.session_state[ac_power_key], format="%.2f", key=ac_power_key)
     
     with col2:
-        p90 = st.number_input("P90 MWh/año", value=scenario.variables.p90_mwh_per_year, format="%.2f", key=p90_key)
-        dc_power = st.number_input("Potencia DC (kWp)", value=scenario.variables.dc_power_mwp, format="%.2f", key=dc_power_key)
+        p90 = st.number_input("P90 MWh/año", value=st.session_state[p90_key], format="%.2f", key=p90_key)
+        dc_power = st.number_input("Potencia DC (kWp)", value=st.session_state[dc_power_key], format="%.2f", key=dc_power_key)
     
     with col3:
-        currency = st.selectbox("Moneda", options=["COP", "USD", "EUR"], index=["COP", "USD", "EUR"].index(scenario.variables.currency) if scenario.variables.currency in ["COP", "USD", "EUR"] else 0, key=currency_key)
-        fx_rate = st.number_input("Tasa de cambio", value=scenario.variables.fx_rate, format="%.4f", key=fx_rate_key)
+        currency = st.selectbox("Moneda", options=["COP", "USD", "EUR"], index=["COP", "USD", "EUR"].index(st.session_state[currency_key]) if st.session_state[currency_key] in ["COP", "USD", "EUR"] else 0, key=currency_key)
+        fx_rate = st.number_input("Tasa de cambio", value=st.session_state[fx_rate_key], format="%.4f", key=fx_rate_key)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Update variables from widget values (always read from session_state to get latest)
-    scenario.variables.p50_mwh_per_year = p50
-    scenario.variables.p90_mwh_per_year = p90
-    scenario.variables.ac_power_mw = ac_power
-    scenario.variables.dc_power_mwp = dc_power
-    scenario.variables.currency = currency
-    scenario.variables.fx_rate = fx_rate
+    # These values are now guaranteed to be in session_state
+    scenario.variables.p50_mwh_per_year = st.session_state[p50_key]
+    scenario.variables.p90_mwh_per_year = st.session_state[p90_key]
+    scenario.variables.ac_power_mw = st.session_state[ac_power_key]
+    scenario.variables.dc_power_mwp = st.session_state[dc_power_key]
+    scenario.variables.currency = st.session_state[currency_key]
+    scenario.variables.fx_rate = st.session_state[fx_rate_key]
     
     # Derived metrics (always visible) - Using KPI cards
     st.subheader("Métricas Derivadas")
