@@ -348,8 +348,19 @@ def render_sidebar():
                             pass  # Ignore errors if scenario doesn't exist
                         # Clear item-related session state from previous scenario
                         keys_to_remove = [key for key in st.session_state.keys() if key.startswith('item_') or key.startswith('qty_') or key.startswith('price_') or key.startswith('vat_') or key.startswith('mode_') or key.startswith('client_') or key.startswith('code_') or key.startswith('name_') or key.startswith('unit_') or key.startswith('price_includes_vat_') or key.startswith('edit_item_')]
+                        # Also clear energy variable keys for previous scenario
+                        prev_id = previous_scenario_id
+                        keys_to_remove.extend([
+                            f'p50_input_{prev_id}',
+                            f'p90_input_{prev_id}',
+                            f'ac_power_input_{prev_id}',
+                            f'dc_power_input_{prev_id}',
+                            f'currency_input_{prev_id}',
+                            f'fx_rate_input_{prev_id}'
+                        ])
                         for key in keys_to_remove:
-                            del st.session_state[key]
+                            if key in st.session_state:
+                                del st.session_state[key]
                     st.session_state.current_scenario_id = new_scenario_id
                 else:
                     # If scenario was deselected, save previous scenario before clearing
@@ -362,8 +373,19 @@ def render_sidebar():
                             pass
                         # Clear item-related session state
                         keys_to_remove = [key for key in st.session_state.keys() if key.startswith('item_') or key.startswith('qty_') or key.startswith('price_') or key.startswith('vat_') or key.startswith('mode_') or key.startswith('client_') or key.startswith('code_') or key.startswith('name_') or key.startswith('unit_') or key.startswith('price_includes_vat_') or key.startswith('edit_item_')]
+                        # Also clear energy variable keys for previous scenario
+                        prev_id = previous_scenario_id
+                        keys_to_remove.extend([
+                            f'p50_input_{prev_id}',
+                            f'p90_input_{prev_id}',
+                            f'ac_power_input_{prev_id}',
+                            f'dc_power_input_{prev_id}',
+                            f'currency_input_{prev_id}',
+                            f'fx_rate_input_{prev_id}'
+                        ])
                         for key in keys_to_remove:
-                            del st.session_state[key]
+                            if key in st.session_state:
+                                del st.session_state[key]
                     st.session_state.current_scenario_id = None
             else:
                 st.sidebar.info("No hay escenarios. Crea uno nuevo.")
@@ -642,19 +664,28 @@ def save_scenario_changes(scenario: Scenario):
             item.aiu_factors.imprev_factor = factors.get('imprev_factor', item.aiu_factors.imprev_factor)
             item.aiu_factors.util_factor = factors.get('util_factor', item.aiu_factors.util_factor)
     
-    # Apply variable changes from session state
-    if 'p50_input' in st.session_state:
-        scenario.variables.p50_mwh_per_year = st.session_state['p50_input']
-    if 'p90_input' in st.session_state:
-        scenario.variables.p90_mwh_per_year = st.session_state['p90_input']
-    if 'ac_power_input' in st.session_state:
-        scenario.variables.ac_power_mw = st.session_state['ac_power_input']
-    if 'dc_power_input' in st.session_state:
-        scenario.variables.dc_power_mwp = st.session_state['dc_power_input']
-    if 'currency_input' in st.session_state:
-        scenario.variables.currency = st.session_state['currency_input']
-    if 'fx_rate_input' in st.session_state:
-        scenario.variables.fx_rate = st.session_state['fx_rate_input']
+    # Apply variable changes from session state (use scenario-specific keys)
+    scenario_id = scenario.scenario_id
+    p50_key = f"p50_input_{scenario_id}"
+    p90_key = f"p90_input_{scenario_id}"
+    ac_power_key = f"ac_power_input_{scenario_id}"
+    dc_power_key = f"dc_power_input_{scenario_id}"
+    currency_key = f"currency_input_{scenario_id}"
+    fx_rate_key = f"fx_rate_input_{scenario_id}"
+    
+    # Read from scenario-specific keys (most recent widget values)
+    if p50_key in st.session_state:
+        scenario.variables.p50_mwh_per_year = st.session_state[p50_key]
+    if p90_key in st.session_state:
+        scenario.variables.p90_mwh_per_year = st.session_state[p90_key]
+    if ac_power_key in st.session_state:
+        scenario.variables.ac_power_mw = st.session_state[ac_power_key]
+    if dc_power_key in st.session_state:
+        scenario.variables.dc_power_mwp = st.session_state[dc_power_key]
+    if currency_key in st.session_state:
+        scenario.variables.currency = st.session_state[currency_key]
+    if fx_rate_key in st.session_state:
+        scenario.variables.fx_rate = st.session_state[fx_rate_key]
     
     # Apply AIU config changes (use scenario_id-specific keys)
     scenario_id = scenario.scenario_id
@@ -812,21 +843,30 @@ def render_capex_builder():
     st.subheader("Variables del Escenario")
     col1, col2, col3, col4 = st.columns(4)
     
+    # Use scenario-specific keys for energy variables to prevent cross-scenario contamination
+    scenario_id = scenario.scenario_id
+    p50_key = f"p50_input_{scenario_id}"
+    p90_key = f"p90_input_{scenario_id}"
+    ac_power_key = f"ac_power_input_{scenario_id}"
+    dc_power_key = f"dc_power_input_{scenario_id}"
+    currency_key = f"currency_input_{scenario_id}"
+    fx_rate_key = f"fx_rate_input_{scenario_id}"
+    
     with col1:
-        p50 = st.number_input("P50 MWh/año", value=scenario.variables.p50_mwh_per_year, format="%.2f", key="p50_input")
-        ac_power = st.number_input("Potencia AC (MW)", value=scenario.variables.ac_power_mw, format="%.2f", key="ac_power_input")
+        p50 = st.number_input("P50 MWh/año", value=scenario.variables.p50_mwh_per_year, format="%.2f", key=p50_key)
+        ac_power = st.number_input("Potencia AC (MW)", value=scenario.variables.ac_power_mw, format="%.2f", key=ac_power_key)
     
     with col2:
-        p90 = st.number_input("P90 MWh/año", value=scenario.variables.p90_mwh_per_year, format="%.2f", key="p90_input")
-        dc_power = st.number_input("Potencia DC (kWp)", value=scenario.variables.dc_power_mwp, format="%.2f", key="dc_power_input")
+        p90 = st.number_input("P90 MWh/año", value=scenario.variables.p90_mwh_per_year, format="%.2f", key=p90_key)
+        dc_power = st.number_input("Potencia DC (kWp)", value=scenario.variables.dc_power_mwp, format="%.2f", key=dc_power_key)
     
     with col3:
-        currency = st.selectbox("Moneda", options=["COP", "USD", "EUR"], index=["COP", "USD", "EUR"].index(scenario.variables.currency) if scenario.variables.currency in ["COP", "USD", "EUR"] else 0, key="currency_input")
-        fx_rate = st.number_input("Tasa de cambio", value=scenario.variables.fx_rate, format="%.4f", key="fx_rate_input")
+        currency = st.selectbox("Moneda", options=["COP", "USD", "EUR"], index=["COP", "USD", "EUR"].index(scenario.variables.currency) if scenario.variables.currency in ["COP", "USD", "EUR"] else 0, key=currency_key)
+        fx_rate = st.number_input("Tasa de cambio", value=scenario.variables.fx_rate, format="%.4f", key=fx_rate_key)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Update variables
+    # Update variables from widget values (always read from session_state to get latest)
     scenario.variables.p50_mwh_per_year = p50
     scenario.variables.p90_mwh_per_year = p90
     scenario.variables.ac_power_mw = ac_power
