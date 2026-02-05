@@ -1,41 +1,41 @@
 {
-  "scenario_id": "1b8cd21b-12e5-4c8b-b2af-1aca2f2b4128",
-  "project_id": "1a030743-0d2d-43d7-b634-52d7170a6f2f",
-  "name": "Presupuesto Tecnosolar - Compras Cliente",
-  "created_at": "2026-01-28T11:16:11.680370",
-  "updated_at": "2026-01-28T12:53:12.034518",
+  "scenario_id": "147aad5a-f3ec-4b12-8deb-79cfe1c51b75",
+  "project_id": "0cb9f8e6-1e38-427c-be35-a35f97218894",
+  "name": "Delphi - Jan 30 2026",
+  "created_at": "2026-02-03T15:17:49.430951",
+  "updated_at": "2026-02-03T15:22:29.037159",
   "variables": {
-    "p50_mwh_per_year": 1877.0,
-    "p90_mwh_per_year": 1710.5,
+    "p50_mwh_per_year": 1802.0,
+    "p90_mwh_per_year": 1642.4,
     "ac_power_mw": 0.99,
-    "dc_power_mwp": 1296.0,
+    "dc_power_mwp": 1309.0,
     "currency": "COP",
-    "fx_rate": 3800.0
+    "fx_rate": 3700.0
   },
   "aiu_config": {
     "enabled": true,
-    "admin_pct": 8.0,
-    "imprev_pct": 4.0,
-    "util_pct": 7.0
+    "admin_pct": 10.0,
+    "imprev_pct": 8.0,
+    "util_pct": 14.0
   },
   "vat_config": {
-    "vat_recoverable": true,
+    "vat_recoverable": false,
     "vat_on_utilidad_enabled": true,
-    "vat_rate_utilidad": 19.0
+    "vat_rate_utilidad": 0.0
   },
   "items": [
     {
-      "item_id": "601cc2d3-7cba-4fe3-a8fa-11f874bcac9b",
+      "item_id": "1d7b125a-e54d-4636-8a73-ba88b3bb0930",
       "item_code": "MOD-BC-XXX",
-      "name": "JA SOLAR 710W BIFACIALES",
+      "name": "JA SOLAR 720W BIFACIALES",
       "category_code": "PV-MOD",
       "description": "Módulos PV bifaciales según ficha técnica y garantía",
-      "qty": 1800.0,
+      "qty": 1818.0,
       "unit": "UND",
       "pricing_mode": "UNIT",
-      "price": 370378.0,
-      "vat_rate": 19.0,
-      "price_includes_vat": true,
+      "price": 390794.0,
+      "vat_rate": 0.0,
+      "price_includes_vat": false,
       "client_pays": true,
       "aiu_factors": {
         "admin_factor": 100.0,
@@ -51,7 +51,7 @@
       "order": 1
     },
     {
-      "item_id": "39a46d88-05ed-41d9-9a00-a70cdbd07ac3",
+      "item_id": "90643eff-2f8e-4369-8cfa-91d22c485918",
       "item_code": "INV-CEN-XXX",
       "name": "Huawie SUN2000 330KTL",
       "category_code": "PV-INV",
@@ -59,8 +59,8 @@
       "qty": 3.0,
       "unit": "UND",
       "pricing_mode": "UNIT",
-      "price": 45780000.0,
-      "vat_rate": 19.0,
+      "price": 32400000.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": true,
       "aiu_factors": {
@@ -77,7 +77,7 @@
       "order": 1
     },
     {
-      "item_id": "78d93a63-0425-4331-a962-d7ef6a82acf9",
+      "item_id": "3410db66-011a-4f87-88a8-d79ea130953b",
       "item_code": "INV-SKID-LV",
       "name": "Smart Logger 300A",
       "category_code": "PV-INV",
@@ -85,7 +85,7 @@
       "qty": 1.0,
       "unit": "LOTE",
       "pricing_mode": "UNIT",
-      "price": 4000000.0,
+      "price": 2142000.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": true,
@@ -103,44 +103,18 @@
       "order": 2
     },
     {
-      "item_id": "aefd34f5-b165-4f75-9864-2a51901b4169",
-      "item_code": "INV-STR-XXX",
-      "name": "SmartPS-80A- T0",
-      "category_code": "PV-INV",
-      "description": "Inversor(es) string según potencia y garantías",
-      "qty": 1.0,
-      "unit": "UND",
-      "pricing_mode": "UNIT",
-      "price": 800000.0,
-      "vat_rate": 19.0,
-      "price_includes_vat": true,
-      "client_pays": true,
-      "aiu_factors": {
-        "admin_factor": 100.0,
-        "imprev_factor": 100.0,
-        "util_factor": 100.0
-      },
-      "incoterm": "NA",
-      "includes_installation": false,
-      "includes_transport": false,
-      "includes_commissioning": false,
-      "delivery_point": "Puesto en obra",
-      "notes": "",
-      "order": 3
-    },
-    {
-      "item_id": "219ccd7e-d42a-4004-8c93-816ca9e40587",
+      "item_id": "bddf4918-d37c-4221-8390-660326f90c4a",
       "item_code": "SBOS-FIX",
       "name": "Estructura fija (suministro)",
       "category_code": "PV-SBOS",
       "description": "Estructura fija galvanizada, suministro",
-      "qty": 1800.0,
-      "unit": "Unidad",
+      "qty": 1.0,
+      "unit": "GLOBAL",
       "pricing_mode": "UNIT",
-      "price": 220100.0,
-      "vat_rate": 19.0,
+      "price": 289325987.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
-      "client_pays": false,
+      "client_pays": true,
       "aiu_factors": {
         "admin_factor": 100.0,
         "imprev_factor": 100.0,
@@ -155,33 +129,7 @@
       "order": 4
     },
     {
-      "item_id": "da92d55c-fac8-4a3e-8a65-140e26d3ad8f",
-      "item_code": "ENG-GEO",
-      "name": "Estudio geotécnico / suelos",
-      "category_code": "PV-ENG",
-      "description": "Sondeos, laboratorio, informe geotécnico",
-      "qty": 1.0,
-      "unit": "UNIDAD",
-      "pricing_mode": "UNIT",
-      "price": 20390000.0,
-      "vat_rate": 19.0,
-      "price_includes_vat": true,
-      "client_pays": false,
-      "aiu_factors": {
-        "admin_factor": 100.0,
-        "imprev_factor": 100.0,
-        "util_factor": 100.0
-      },
-      "incoterm": "NA",
-      "includes_installation": false,
-      "includes_transport": false,
-      "includes_commissioning": false,
-      "delivery_point": "Puesto en obra",
-      "notes": "",
-      "order": 5
-    },
-    {
-      "item_id": "a7486b94-0ff3-4ae3-86ba-c3f7105e6192",
+      "item_id": "58568415-8ded-4851-87bb-fe365a375740",
       "item_code": "ENG-RETIE",
       "name": "Gestión RETIE / certificación",
       "category_code": "PV-ENG",
@@ -189,7 +137,7 @@
       "qty": 1.0,
       "unit": "unidad",
       "pricing_mode": "UNIT",
-      "price": 15000000.0,
+      "price": 10710000.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -207,7 +155,7 @@
       "order": 6
     },
     {
-      "item_id": "9208efd7-1b70-4ee2-9489-a2143ce5d5bc",
+      "item_id": "8df4ae52-7bed-42b3-a543-9225ed60f22c",
       "item_code": "ENG-UPME",
       "name": "Trámites UPME / conexión (si aplica)",
       "category_code": "PV-ENG",
@@ -215,10 +163,10 @@
       "qty": 1.0,
       "unit": "1",
       "pricing_mode": "UNIT",
-      "price": 6292000.0,
+      "price": 22000000.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
-      "client_pays": false,
+      "client_pays": true,
       "aiu_factors": {
         "admin_factor": 100.0,
         "imprev_factor": 100.0,
@@ -233,33 +181,7 @@
       "order": 7
     },
     {
-      "item_id": "b21dcc4a-5341-406f-bb59-9c7f8260b223",
-      "item_code": "SUB-STUDY-INT",
-      "name": "Estudios de conexión / interconexión",
-      "category_code": "PV-SUB",
-      "description": "Estudios de acceso, protecciones, coordinación, etc.",
-      "qty": 1.0,
-      "unit": "LOTE",
-      "pricing_mode": "UNIT",
-      "price": 10173310.0,
-      "vat_rate": 19.0,
-      "price_includes_vat": true,
-      "client_pays": false,
-      "aiu_factors": {
-        "admin_factor": 100.0,
-        "imprev_factor": 100.0,
-        "util_factor": 100.0
-      },
-      "incoterm": "NA",
-      "includes_installation": false,
-      "includes_transport": false,
-      "includes_commissioning": false,
-      "delivery_point": "Puesto en obra",
-      "notes": "",
-      "order": 9
-    },
-    {
-      "item_id": "16c7b227-70b1-4a8f-bcb8-914492f6b9ad",
+      "item_id": "db6d7b1e-c16d-4f32-b3c4-c14edca6b151",
       "item_code": "EBOS-EARTH",
       "name": "Puesta a tierra",
       "category_code": "PV-EBOS",
@@ -285,7 +207,7 @@
       "order": 11
     },
     {
-      "item_id": "45bdd8bb-cf42-4a6e-b031-c39067d6cdc0",
+      "item_id": "9d5942f2-7691-4055-bd5b-ea3b911bacd2",
       "item_code": "EBOS-MAT-DCAC",
       "name": "Material DC/AC (lote general)",
       "category_code": "PV-EBOS",
@@ -311,9 +233,9 @@
       "order": 12
     },
     {
-      "item_id": "57274cf7-949d-4234-89ed-578181c0ab70",
+      "item_id": "c424493d-14c3-41b5-880b-b65513fff165",
       "item_code": "EBOS-LPS",
-      "name": "Protección contra rayos (LPS)",
+      "name": "Reconectador de Protecciones",
       "category_code": "PV-EBOS",
       "description": "Pararrayos, bajantes, puesta a tierra asociada",
       "qty": 1.0,
@@ -337,17 +259,17 @@
       "order": 13
     },
     {
-      "item_id": "de8f2b11-745c-4f48-b72f-f9a5f22161f8",
+      "item_id": "a4c8fdc1-af4d-44fe-93d4-6581ac3dc950",
       "item_code": "CIV-EXC-FOUND",
       "name": "Excavación zapatas y/o pilotes",
       "category_code": "PV-CIV",
       "description": "Excavación para zapatas y/o pilotes",
-      "qty": 1.0,
+      "qty": 846.0,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 67340100.0,
-      "vat_rate": 19.0,
-      "price_includes_vat": true,
+      "price": 52800.0,
+      "vat_rate": 0.0,
+      "price_includes_vat": false,
       "client_pays": false,
       "aiu_factors": {
         "admin_factor": 100.0,
@@ -363,17 +285,17 @@
       "order": 14
     },
     {
-      "item_id": "ee324ba0-7b40-4e86-aff6-0bf51873b4fc",
+      "item_id": "f1e5e362-5b67-46ae-9789-22773c854f68",
       "item_code": "CIV-CONC-FOUND",
       "name": "Concreto zapatas y/o pilotes",
       "category_code": "PV-CIV",
       "description": "Concreto para zapatas y/o pilotes",
-      "qty": 1.0,
+      "qty": 98.982,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 68520300.0,
-      "vat_rate": 19.0,
-      "price_includes_vat": true,
+      "price": 497400.0,
+      "vat_rate": 0.0,
+      "price_includes_vat": false,
       "client_pays": false,
       "aiu_factors": {
         "admin_factor": 100.0,
@@ -389,15 +311,15 @@
       "order": 15
     },
     {
-      "item_id": "1851ee61-a7c0-4656-a7a6-3b3405277dbb",
+      "item_id": "5252e603-2d34-49f6-8e14-b4e84cbdcdaa",
       "item_code": "DEV-POLICY",
       "name": "Pólizas contractuales",
       "category_code": "PV-DEV",
       "description": "Pólizas de seguro contractuales",
-      "qty": 0.0,
+      "qty": 1.0,
       "unit": "LOTE",
-      "pricing_mode": "PER_KWP",
-      "price": 19.233,
+      "pricing_mode": "UNIT",
+      "price": 23567212.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -415,15 +337,15 @@
       "order": 15
     },
     {
-      "item_id": "72bf048d-751c-48d1-913b-9b4c744114c8",
+      "item_id": "445d2a0e-b173-486e-a5fd-76ac2e5ee864",
       "item_code": "DEV-TRANSPORT",
       "name": "Transporte / logística local",
       "category_code": "PV-DEV",
       "description": "Transporte y logística local del proyecto",
-      "qty": 0.0,
+      "qty": 1.0,
       "unit": "LOTE",
-      "pricing_mode": "PER_KWP",
-      "price": 12.021,
+      "pricing_mode": "UNIT",
+      "price": 14729508.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -441,15 +363,15 @@
       "order": 16
     },
     {
-      "item_id": "d2c87502-a45c-4154-8d4b-6b6b98ad5879",
+      "item_id": "900ed733-8b0a-441d-82a7-902ea3a3f5ab",
       "item_code": "ENG-DETAIL",
       "name": "Ingeniería de detalle",
       "category_code": "PV-ENG",
       "description": "Planos IFC, memorias, especificaciones",
-      "qty": 0.0,
+      "qty": 1.0,
       "unit": "LOTE",
-      "pricing_mode": "PER_KWP",
-      "price": 14.906,
+      "pricing_mode": "UNIT",
+      "price": 18264589.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -467,7 +389,7 @@
       "order": 17
     },
     {
-      "item_id": "0c7d0c52-0434-4df8-93bd-29f42fc890a1",
+      "item_id": "832b22ea-c2c5-4adc-bf33-5bd58f7a6b03",
       "item_code": "CIV-SEC",
       "name": "Seguridad / vigilancia de obra",
       "category_code": "PV-CIV",
@@ -493,7 +415,7 @@
       "order": 18
     },
     {
-      "item_id": "567d6fe5-077b-49e3-81e0-67abfe9fd565",
+      "item_id": "aae8faaf-4c05-40d3-b7ed-2b7e4bba7d7f",
       "item_code": "EBOS-TRNCH",
       "name": "Zanjas / ductería / canalización",
       "category_code": "PV-EBOS",
@@ -501,7 +423,7 @@
       "qty": 1.0,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 64218000.0,
+      "price": 34850000.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -519,7 +441,7 @@
       "order": 19
     },
     {
-      "item_id": "561c423d-133d-4664-bc17-3c9d306f3c42",
+      "item_id": "a781df58-f99e-4f14-92d6-f6a8ca03e55d",
       "item_code": "EBOS-TRF-1250KVA",
       "name": "Estación de Transformación 1.250 kVA",
       "category_code": "PV-EBOS",
@@ -527,8 +449,8 @@
       "qty": 1.0,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 479000000.0,
-      "vat_rate": 19.0,
+      "price": 402521008.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": true,
       "aiu_factors": {
@@ -545,7 +467,7 @@
       "order": 19
     },
     {
-      "item_id": "8d9fef45-2660-4cfd-9d5c-d2a4f06dd369",
+      "item_id": "4441686d-1a24-45ea-8e9c-25c46982e227",
       "item_code": "SEC-CCTV",
       "name": "CCTV y seguridad electrónica",
       "category_code": "PV-SCADA",
@@ -571,7 +493,7 @@
       "order": 20
     },
     {
-      "item_id": "7d810e60-f01f-47d6-9453-f32366ff4349",
+      "item_id": "c8f9f2d4-871d-4bbe-82ae-fb4eca297b2c",
       "item_code": "SUB-MV-CONN",
       "name": "Conexión a Red de Media",
       "category_code": "PV-SUB",
@@ -579,7 +501,7 @@
       "qty": 1.0,
       "unit": "LOTE",
       "pricing_mode": "UNIT",
-      "price": 200000000.0,
+      "price": 120000000.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -597,7 +519,7 @@
       "order": 21
     },
     {
-      "item_id": "87da272e-fd0e-4007-9298-6b8a5896c72f",
+      "item_id": "6d385eaf-da54-4a8e-acf0-5f9db302bc39",
       "item_code": "INST-FORKLIFT",
       "name": "Montacarga / equipos de izaje (alquiler)",
       "category_code": "PV-INST",
@@ -605,7 +527,7 @@
       "qty": 1.0,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 7360000.0,
+      "price": 15345900.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -623,16 +545,16 @@
       "order": 22
     },
     {
-      "item_id": "cebec342-e5e2-46d6-ac15-f8ab37af9346",
+      "item_id": "7f23929d-daae-472a-9a1f-86b15dd38c77",
       "item_code": "INST-MOD",
       "name": "Instalación de módulos",
       "category_code": "PV-INST",
       "description": "Mano de obra instalación de módulos",
-      "qty": 1278.0,
+      "qty": 1308.96,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 190000.0,
-      "vat_rate": 19.0,
+      "price": 210000.0,
+      "vat_rate": 0.0,
       "price_includes_vat": true,
       "client_pays": false,
       "aiu_factors": {
@@ -649,7 +571,7 @@
       "order": 23
     },
     {
-      "item_id": "24952790-5de3-434a-9e33-7365a7a59661",
+      "item_id": "d66ae2de-b1e3-47e4-8105-f9bf12508fac",
       "item_code": "ENG-AC-DESIGN",
       "name": "Diseño Eléctrico AC",
       "category_code": "PV-ENG",
@@ -657,7 +579,7 @@
       "qty": 1.0,
       "unit": "Unidad",
       "pricing_mode": "UNIT",
-      "price": 12121000.0,
+      "price": 18745000.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -675,7 +597,7 @@
       "order": 24
     },
     {
-      "item_id": "55366eb2-708c-4328-8608-891b1a379319",
+      "item_id": "5e1e8d44-fd59-4879-add8-3502da4d9249",
       "item_code": "EBOS-METER",
       "name": "Medición (medidor bidireccional / medición comercial)",
       "category_code": "PV-EBOS",
@@ -683,7 +605,7 @@
       "qty": 2.0,
       "unit": "LOTE",
       "pricing_mode": "UNIT",
-      "price": 6357000.0,
+      "price": 6489400.0,
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
@@ -701,7 +623,7 @@
       "order": 26
     },
     {
-      "item_id": "91679b33-adf2-49ae-a200-0620ca768256",
+      "item_id": "1a81a3a0-427b-4a62-9585-ab1fbec59489",
       "item_code": "ENG-UTILITY-FILING",
       "name": "Costos Radicado CENS",
       "category_code": "PV-ENG",
@@ -713,6 +635,58 @@
       "vat_rate": 19.0,
       "price_includes_vat": true,
       "client_pays": false,
+      "aiu_factors": {
+        "admin_factor": 100.0,
+        "imprev_factor": 100.0,
+        "util_factor": 100.0
+      },
+      "incoterm": "NA",
+      "includes_installation": false,
+      "includes_transport": false,
+      "includes_commissioning": false,
+      "delivery_point": "Puesto en obra",
+      "notes": "",
+      "order": 26
+    },
+    {
+      "item_id": "ae42c2c7-76e3-4f09-ba21-1b0718c019b9",
+      "item_code": "CIV-GRADE",
+      "name": "Movimiento de tierras / nivelación",
+      "category_code": "PV-CIV",
+      "description": "Cortes, rellenos, conformación de plataforma",
+      "qty": 1.0,
+      "unit": "global",
+      "pricing_mode": "UNIT",
+      "price": 334500000.0,
+      "vat_rate": 0.0,
+      "price_includes_vat": true,
+      "client_pays": true,
+      "aiu_factors": {
+        "admin_factor": 100.0,
+        "imprev_factor": 100.0,
+        "util_factor": 100.0
+      },
+      "incoterm": "NA",
+      "includes_installation": false,
+      "includes_transport": false,
+      "includes_commissioning": false,
+      "delivery_point": "Puesto en obra",
+      "notes": "",
+      "order": 27
+    },
+    {
+      "item_id": "c075a34a-0afd-465f-9330-c2822fac4421",
+      "item_code": "MOD-BC-XXX",
+      "name": "JA SOLAR 720W - Contingencia",
+      "category_code": "PV-MOD",
+      "description": "Módulos PV bifaciales según ficha técnica y garantía",
+      "qty": 19.0,
+      "unit": "UND",
+      "pricing_mode": "UNIT",
+      "price": 390794.0,
+      "vat_rate": 0.0,
+      "price_includes_vat": false,
+      "client_pays": true,
       "aiu_factors": {
         "admin_factor": 100.0,
         "imprev_factor": 100.0,

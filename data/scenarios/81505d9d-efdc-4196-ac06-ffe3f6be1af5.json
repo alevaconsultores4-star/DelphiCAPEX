@@ -3,12 +3,12 @@
   "project_id": "1a030743-0d2d-43d7-b634-52d7170a6f2f",
   "name": "Presupuesto Tecnosolar - Dic 2025",
   "created_at": "2026-01-28T11:16:11.617559",
-  "updated_at": "2026-01-28T12:52:59.267496",
+  "updated_at": "2026-02-03T14:09:57.963348",
   "variables": {
-    "p50_mwh_per_year": 1801.7,
-    "p90_mwh_per_year": 1641.4,
+    "p50_mwh_per_year": 1545.2,
+    "p90_mwh_per_year": 1407.7,
     "ac_power_mw": 0.9,
-    "dc_power_mwp": 1309.0,
+    "dc_power_mwp": 1119.0,
     "currency": "COP",
     "fx_rate": 3700.0
   },
@@ -725,6 +725,32 @@
       "delivery_point": "Puesto en obra",
       "notes": "",
       "order": 26
+    },
+    {
+      "item_id": "a9c07beb-9e25-4184-a8fb-b58241c17176",
+      "item_code": "CIV-GRADE",
+      "name": "Movimiento de tierras / nivelación",
+      "category_code": "PV-CIV",
+      "description": "Cortes, rellenos, conformación de plataforma",
+      "qty": 1.0,
+      "unit": "GLOBAL",
+      "pricing_mode": "UNIT",
+      "price": 334500000.0,
+      "vat_rate": 0.0,
+      "price_includes_vat": true,
+      "client_pays": true,
+      "aiu_factors": {
+        "admin_factor": 100.0,
+        "imprev_factor": 100.0,
+        "util_factor": 100.0
+      },
+      "incoterm": "NA",
+      "includes_installation": false,
+      "includes_transport": false,
+      "includes_commissioning": false,
+      "delivery_point": "Puesto en obra",
+      "notes": "",
+      "order": 27
     }
   ]
 }
