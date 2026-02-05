@@ -2025,6 +2025,229 @@ def render_compare():
 
 
 # ============================================================================
+# CATEGORY ANALYSIS TAB
+# ============================================================================
+
+def render_category_analysis():
+    """Render category analysis tab showing totals and per-kWp values for each category across scenarios."""
+    st.header("📊 Análisis por Categoría")
+    
+    if not st.session_state.current_project_id:
+        st.info("Selecciona un proyecto para ver el análisis por categoría.")
+        return
+    
+    # Get all scenarios for current project
+    scenarios = get_scenarios_by_project(st.session_state.current_project_id)
+    
+    if not scenarios:
+        st.info("No hay escenarios en este proyecto.")
+        return
+    
+    if len(scenarios) == 0:
+        st.info("No hay escenarios para analizar.")
+        return
+    
+    # Load all scenarios
+    loaded_scenarios = []
+    for scenario_info in scenarios:
+        scenario = load_scenario(scenario_info['scenario_id'])
+        if scenario:
+            loaded_scenarios.append(scenario)
+    
+    if not loaded_scenarios:
+        st.info("No se pudieron cargar los escenarios.")
+        return
+    
+    # Get all categories from all scenarios
+    from library_service import load_library_categories
+    all_categories = load_library_categories()
+    category_map = {cat.category_code: cat.name_es for cat in all_categories}
+    
+    # Collect category data for each scenario
+    category_data = {}  # {category_code: {'name': str, 'scenarios': {scenario_id: {'total': float, 'per_kwp': float}}}}
+    
+    # Store scenario totals for summary rows
+    scenario_totals_data = {}  # {scenario_id: {'kwp': float, 'epc_total': float, 'client_total': float, 'aiu_total': float, 'project_total': float}}
+    
+    for scenario in loaded_scenarios:
+        # Calculate totals for this scenario
+        totals = calculate_scenario_totals(scenario)
+        cat_totals = aggregate_by_category(scenario, totals)
+        
+        # Get kWp for this scenario
+        scenario_kwp = scenario.variables.dc_power_mwp
+        
+        # Store scenario totals
+        scenario_totals_data[scenario.scenario_id] = {
+            'kwp': scenario_kwp,
+            'epc_total': totals.get('epc_total', 0.0),
+            'client_total': totals.get('client_total', 0.0),
+            'aiu_total': totals.get('aiu_total', 0.0),
+            'project_total': totals.get('project_total', 0.0)
+        }
+        
+        # Process each category
+        for cat_code, cat_info in cat_totals.items():
+            if cat_code not in category_data:
+                category_data[cat_code] = {
+                    'name': cat_info.get('name', category_map.get(cat_code, cat_code)),
+                    'scenarios': {}
+                }
+            
+            total = cat_info.get('total', 0.0)
+            per_kwp = total / scenario_kwp if scenario_kwp > 0 else 0.0
+            
+            category_data[cat_code]['scenarios'][scenario.scenario_id] = {
+                'total': total,
+                'per_kwp': per_kwp,
+                'scenario_name': scenario.name
+            }
+    
+    # Create table data
+    if not category_data:
+        st.info("No hay categorías con datos en los escenarios.")
+        return
+    
+    # Show kWp reference at the top
+    st.subheader("Potencia DC (kWp) por Escenario")
+    kwp_row = {'Categoría': 'Potencia DC (kWp)'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        kwp = scenario_totals_data[scenario_id]['kwp']
+        kwp_row[scenario.name] = format_number(kwp, decimals=2) if kwp > 0 else "N/A"
+    
+    df_kwp = pd.DataFrame([kwp_row])
+    st.dataframe(df_kwp, use_container_width=True, hide_index=True)
+    
+    st.divider()
+    
+    # Create two tables: one for totals, one for per-kWp
+    st.subheader("Valores Totales por Categoría")
+    
+    # Prepare data for totals table
+    totals_data = []
+    for cat_code in sorted(category_data.keys()):
+        row = {
+            'Categoría': category_data[cat_code]['name']
+        }
+        for scenario in loaded_scenarios:
+            scenario_id = scenario.scenario_id
+            if scenario_id in category_data[cat_code]['scenarios']:
+                row[scenario.name] = format_cop(category_data[cat_code]['scenarios'][scenario_id]['total'])
+            else:
+                row[scenario.name] = format_cop(0.0)
+        totals_data.append(row)
+    
+    # Add AIU row
+    aiu_row = {'Categoría': 'AIU'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        aiu_total = scenario_totals_data[scenario_id]['aiu_total']
+        aiu_row[scenario.name] = format_cop(aiu_total)
+    totals_data.append(aiu_row)
+    
+    # Add Total Proyecto row
+    total_row = {'Categoría': 'Total Proyecto'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        project_total = scenario_totals_data[scenario_id]['project_total']
+        total_row[scenario.name] = format_cop(project_total)
+    totals_data.append(total_row)
+    
+    if totals_data:
+        df_totals = pd.DataFrame(totals_data)
+        st.dataframe(df_totals, use_container_width=True, hide_index=True)
+    
+    st.divider()
+    st.subheader("Valores por kWp por Categoría")
+    
+    # Prepare data for per-kWp table
+    per_kwp_data = []
+    for cat_code in sorted(category_data.keys()):
+        row = {
+            'Categoría': category_data[cat_code]['name']
+        }
+        for scenario in loaded_scenarios:
+            scenario_id = scenario.scenario_id
+            if scenario_id in category_data[cat_code]['scenarios']:
+                per_kwp = category_data[cat_code]['scenarios'][scenario_id]['per_kwp']
+                row[scenario.name] = format_cop(per_kwp) if per_kwp > 0 else "N/A"
+            else:
+                row[scenario.name] = "N/A"
+        per_kwp_data.append(row)
+    
+    # Add AIU per kWp row
+    aiu_per_kwp_row = {'Categoría': 'AIU'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        aiu_total = scenario_totals_data[scenario_id]['aiu_total']
+        kwp = scenario_totals_data[scenario_id]['kwp']
+        aiu_per_kwp = aiu_total / kwp if kwp > 0 else 0.0
+        aiu_per_kwp_row[scenario.name] = format_cop(aiu_per_kwp) if aiu_per_kwp > 0 else "N/A"
+    per_kwp_data.append(aiu_per_kwp_row)
+    
+    # Add Total Proyecto per kWp row
+    total_per_kwp_row = {'Categoría': 'Total Proyecto'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        project_total = scenario_totals_data[scenario_id]['project_total']
+        kwp = scenario_totals_data[scenario_id]['kwp']
+        total_per_kwp = project_total / kwp if kwp > 0 else 0.0
+        total_per_kwp_row[scenario.name] = format_cop(total_per_kwp) if total_per_kwp > 0 else "N/A"
+    per_kwp_data.append(total_per_kwp_row)
+    
+    if per_kwp_data:
+        df_per_kwp = pd.DataFrame(per_kwp_data)
+        st.dataframe(df_per_kwp, use_container_width=True, hide_index=True)
+    
+    # Summary section at the bottom
+    st.divider()
+    st.subheader("Resumen por Escenario")
+    
+    # EPC Total table
+    st.markdown("**Total EPC**")
+    epc_row = {'Categoría': 'Total EPC'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        epc_total = scenario_totals_data[scenario_id]['epc_total']
+        epc_row[scenario.name] = format_cop(epc_total)
+    
+    # EPC per kWp row
+    epc_per_kwp_row = {'Categoría': 'Total EPC / kWp'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        epc_total = scenario_totals_data[scenario_id]['epc_total']
+        kwp = scenario_totals_data[scenario_id]['kwp']
+        epc_per_kwp = epc_total / kwp if kwp > 0 else 0.0
+        epc_per_kwp_row[scenario.name] = format_cop(epc_per_kwp) if epc_per_kwp > 0 else "N/A"
+    
+    df_epc = pd.DataFrame([epc_row, epc_per_kwp_row])
+    st.dataframe(df_epc, use_container_width=True, hide_index=True)
+    
+    st.divider()
+    
+    # Client Total table
+    st.markdown("**Total Compras del Cliente**")
+    client_row = {'Categoría': 'Total Compras del Cliente'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        client_total = scenario_totals_data[scenario_id]['client_total']
+        client_row[scenario.name] = format_cop(client_total)
+    
+    # Client per kWp row
+    client_per_kwp_row = {'Categoría': 'Total Compras del Cliente / kWp'}
+    for scenario in loaded_scenarios:
+        scenario_id = scenario.scenario_id
+        client_total = scenario_totals_data[scenario_id]['client_total']
+        kwp = scenario_totals_data[scenario_id]['kwp']
+        client_per_kwp = client_total / kwp if kwp > 0 else 0.0
+        client_per_kwp_row[scenario.name] = format_cop(client_per_kwp) if client_per_kwp > 0 else "N/A"
+    
+    df_client = pd.DataFrame([client_row, client_per_kwp_row])
+    st.dataframe(df_client, use_container_width=True, hide_index=True)
+
+
+# ============================================================================
 # MAIN
 # ============================================================================
 
@@ -2047,7 +2270,7 @@ def main():
     
     # Si hay escenario seleccionado, mostrar tabs normales
     # Main tabs
-    tab1, tab2, tab3 = st.tabs(["📝 Builder", "📚 Biblioteca", "⚖️ Comparar"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📝 Builder", "📚 Biblioteca", "⚖️ Comparar", "📊 Análisis Categorías"])
     
     with tab1:
         render_capex_builder()
@@ -2057,6 +2280,9 @@ def main():
     
     with tab3:
         render_compare()
+    
+    with tab4:
+        render_category_analysis()
 
 
 def render_admin_panel():
